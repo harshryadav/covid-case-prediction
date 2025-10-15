@@ -1,35 +1,46 @@
 # COVID-19 Case Prediction with GluonTS
 
-> Probabilistic time series forecasting of COVID-19 cases using deep learning
+> **Probabilistic time series forecasting of COVID-19 cases using deep learning (GluonTS + PyTorch)**
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![GluonTS](https://img.shields.io/badge/GluonTS-0.14.0+-orange.svg)](https://ts.gluon.ai/)
+[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/)
+[![GluonTS 0.16.2](https://img.shields.io/badge/GluonTS-0.16.2-orange.svg)](https://ts.gluon.ai/)
+[![PyTorch 2.9](https://img.shields.io/badge/PyTorch-2.9-red.svg)](https://pytorch.org/)
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://www.docker.com/)
 
 ---
 
-## 📋 Overview
+## 📋 What This Project Does
 
-This project implements **probabilistic time series forecasting** for COVID-19 cases in the United States using **GluonTS**, a Python toolkit for deep learning-based forecasting. Unlike traditional point predictions, this approach provides:
+**In 2 sentences:** This project forecasts COVID-19 cases in the United States using deep learning-based probabilistic models (DeepAR) with GluonTS. Unlike traditional models that give single predictions, it provides forecast ranges with confidence intervals for better uncertainty quantification.
 
-- 🎯 **Probabilistic Forecasts** with confidence intervals
-- 📊 **Uncertainty Quantification** for informed decision-making
-- 🔮 **Scenario Analysis** for policy intervention planning
-- 🤖 **Advanced Models**: DeepAR, Transformer, Baseline comparisons
-- 📈 **Rigorous Evaluation**: CRPS, MAE, RMSE metrics
+### Core Capabilities
 
-### Key Features
+- 🎯 **14-day COVID-19 case forecasts** for the United States
+- 📊 **Uncertainty quantification** with 50% and 90% confidence intervals
+- 🤖 **DeepAR neural network** + baseline model comparisons
+- 📈 **Rigorous evaluation** using RMSE, MAE, MAPE, sMAPE metrics
+- 📉 **Trend analysis** with 7-day moving averages
+- 🔍 **Exploratory data analysis** with multi-panel visualizations
 
-✅ **Data Pipeline**: Automated loading, preprocessing, and GluonTS formatting  
-✅ **Multiple Models**: Naive baselines + DeepAR probabilistic forecasting  
-✅ **Visualization**: EDA plots, forecast visualizations with uncertainty bands  
-✅ **Evaluation**: Comprehensive metrics (CRPS, MAE, RMSE, MAPE)  
-✅ **Docker Support**: Reproducible containerized environment  
-✅ **Mobility Data**: Optional Google Mobility data integration  
+### Technologies Used
+
+| Component | Technology | Version |
+|-----------|------------|---------|
+| **Language** | Python | 3.10+ |
+| **Time Series Framework** | GluonTS | 0.16.2 |
+| **Deep Learning Backend** | PyTorch | 2.9.0 |
+| **Data Sources** | JHU CSSE COVID-19, Google Mobility | Latest |
+| **Containerization** | Docker | Latest |
+
+**Note:** Originally planned to use MXNet, but switched to PyTorch backend for Python 3.10+ compatibility.  
 
 ---
 
 ## 🚀 Quick Start
+
+**📌 New to this project?** → Read **[GETTING_STARTED.md](GETTING_STARTED.md)** for a complete beginner's guide!
+
+**⚡ Need a quick reference?** → See **[QUICKREF.txt](QUICKREF.txt)** for one-page cheat sheet!
 
 ### Option 1: Local Setup (5 minutes)
 
@@ -43,7 +54,7 @@ pip install -r requirements.txt
 python run_pipeline.py
 
 # 3. View results
-open results/baseline_forecasts.png
+open results/deepar_forecast.png
 ```
 
 ### Option 2: Docker Setup (Recommended)
@@ -64,12 +75,35 @@ docker-compose down
 
 ---
 
+## ✅ What's Implemented vs Planned
+
+### Currently Working (Ready to Use)
+- ✅ **Data Pipeline** - Preprocessing, aggregation, GluonTS formatting
+- ✅ **Baseline Models** - Naive and Seasonal Naive forecasters
+- ✅ **DeepAR Model** - Probabilistic neural network forecasting
+- ✅ **Evaluation** - RMSE, MAE, MAPE, sMAPE, Coverage metrics
+- ✅ **Visualization** - EDA plots, forecast plots with confidence intervals
+- ✅ **PyTorch Backend** - Python 3.10+ compatible
+- ✅ **Docker Support** - Reproducible containerized environment
+
+### Planned for Future (Not Yet Implemented)
+- 🔄 **Transformer Models** - For longer sequences
+- 🔄 **State-Level Forecasting** - Currently only national-level
+- 🔄 **Mobility Data as Covariates** - Data available but not integrated into models
+- 🔄 **Scenario Analysis** - Policy intervention impact
+- 🔄 **Multi-Horizon Forecasting** - 7, 14, 30 day horizons
+- 🔄 **Cross-Validation** - Time series CV framework
+
+**Current Focus:** National-level 14-day forecasts with baseline + DeepAR models
+
+---
+
 ## 📁 Project Structure
 
 ```
 covid-case-prediction/
 │
-├── 📊 data/                          # Datasets
+├── 📊 data/                          # Datasets (auto-downloaded)
 │   ├── time_series_covid19_confirmed_US.csv
 │   ├── time_series_covid19_deaths_US.csv
 │   ├── time_series_covid19_vaccine_us.csv
@@ -77,129 +111,124 @@ covid-case-prediction/
 │
 ├── 💻 src/                           # Source code
 │   ├── data_processing/              # Data pipeline
+│   │   ├── preprocess.py            # Clean and merge data
+│   │   └── prepare_gluonts.py       # GluonTS formatting
 │   ├── models/                       # Model training
-│   ├── evaluation/                   # Metrics
+│   │   ├── train_baseline.py        # Naive models
+│   │   └── train_deepar.py          # DeepAR neural network
 │   ├── visualization/                # Plotting
-│   └── utils/                        # Helpers
+│   │   └── create_eda_plots.py      # EDA visualizations
+│   └── evaluation/                   # Metrics
+│       └── metrics.py               # Evaluation functions
 │
-├── 🎯 run_pipeline.py                # Main entry point
-├── 📄 requirements.txt               # Dependencies
+├── 🎯 run_pipeline.py                # Main entry point (run everything)
+├── 📄 requirements.txt               # Python dependencies
 │
 ├── 🐳 Dockerfile                     # Container setup
 ├── 🐳 docker-compose.yml             # Orchestration
 │
 └── 📚 Documentation/
-    ├── README.md                     # This file
+    ├── GETTING_STARTED.md ⭐        # Start here!
+    ├── QUICKREF.txt ⚡              # One-page reference
     ├── QUICKSTART.md                 # 30-minute tutorial
+    ├── README.md                     # This file
+    ├── MODEL_GUIDE.md                # Model architecture
     ├── DATASET_GUIDE.md              # Data documentation
-    ├── MODEL_GUIDE.md                # Model architecture & training
-    ├── CODE_REFERENCE.md             # Code organization
+    ├── CODE_REFERENCE.md             # Code structure
+    ├── PROJECT_PLAN.md               # Implementation roadmap
     ├── DOCKER.md                     # Docker usage
-    ├── REFERENCE.md                  # Quick commands
-    └── PROJECT_PLAN.md               # Detailed 7-week roadmap
+    ├── REFERENCE.md                  # Command reference
+    └── SETUP_COMPLETE.md             # Troubleshooting
 ```
 
 ---
 
-## 📖 Documentation
+## 📖 Documentation Guide
 
-### For New Users
-- **[QUICKSTART.md](QUICKSTART.md)** - 30-minute hands-on tutorial
-- **[README.md](README.md)** - This file (overview)
+### 🎯 Quick Navigation
 
-### For Development
-- **[CODE_REFERENCE.md](CODE_REFERENCE.md)** - Code structure & modules
-- **[MODEL_GUIDE.md](MODEL_GUIDE.md)** - GluonTS models & training
-- **[DATASET_GUIDE.md](DATASET_GUIDE.md)** - Dataset documentation
+**New User?** → [GETTING_STARTED.md](GETTING_STARTED.md) ⭐  
+**Need Commands?** → [QUICKREF.txt](QUICKREF.txt) ⚡  
+**Want Tutorial?** → [QUICKSTART.md](QUICKSTART.md) 📚  
 
-### For Deployment
-- **[DOCKER.md](DOCKER.md)** - Docker setup & usage
-- **[REFERENCE.md](REFERENCE.md)** - Quick command reference
+### Full Documentation
 
-### For Planning
-- **[PROJECT_PLAN.md](PROJECT_PLAN.md)** - Detailed 7-week implementation roadmap
-
----
-
-## 🎯 What This Project Does
-
-### 1. Data Processing
-```python
-# Loads and preprocesses COVID-19 data
-from src.data_processing import DataLoader, preprocess_national_data
-
-loader = DataLoader()
-cases_df = loader.load_cases()
-deaths_df = loader.load_deaths()
-
-# Aggregates to national level, merges with mobility data
-national_df = preprocess_national_data(cases_df, deaths_df)
-```
-
-### 2. Model Training
-```python
-# Trains baseline and DeepAR models
-python src/models/train_baseline.py      # Naive, Seasonal Naive
-python src/models/train_deepar.py        # Probabilistic DeepAR
-```
-
-### 3. Evaluation & Visualization
-```python
-# Evaluates forecasts and creates visualizations
-from src.evaluation.metrics import calculate_metrics
-from src.visualization.plot_utils import plot_forecast
-
-metrics = calculate_metrics(actual, forecast)
-plot_forecast(forecast, actual, save_path='results/forecast.png')
-```
+| Document | Purpose | When to Read |
+|----------|---------|--------------|
+| [GETTING_STARTED.md](GETTING_STARTED.md) | Complete setup guide | First time setup |
+| [QUICKREF.txt](QUICKREF.txt) | One-page command reference | Quick lookups |
+| [QUICKSTART.md](QUICKSTART.md) | 30-minute walkthrough tutorial | Learning the pipeline |
+| [MODEL_GUIDE.md](MODEL_GUIDE.md) | Model architecture & training | Understanding models |
+| [DATASET_GUIDE.md](DATASET_GUIDE.md) | Data sources & structure | Working with data |
+| [CODE_REFERENCE.md](CODE_REFERENCE.md) | Code organization | Development |
+| [PROJECT_PLAN.md](PROJECT_PLAN.md) | Implementation roadmap | Planning features |
+| [DOCKER.md](DOCKER.md) | Docker usage | Containerization |
+| [SETUP_COMPLETE.md](SETUP_COMPLETE.md) | Troubleshooting | Fixing issues |
+| [REFERENCE.md](REFERENCE.md) | All commands | Command reference |
 
 ---
 
-## 🤖 Models Implemented
+## 📊 Project Goals
 
-| Model | Type | Use Case | Status |
-|-------|------|----------|--------|
-| **Naive** | Baseline | Simple benchmark | ✅ |
-| **Seasonal Naive** | Baseline | Weekly pattern | ✅ |
-| **DeepAR** | Probabilistic | Advanced forecasting | ✅ |
-| **Transformer** | Deep Learning | Long sequences | 🔄 Future |
-| **Gaussian Process** | Probabilistic | Uncertainty | 🔄 Future |
+### Primary Objectives
+1. ✅ **Forecast COVID-19 cases** for the United States
+2. ✅ **Provide uncertainty quantification** with confidence intervals
+3. ✅ **Compare multiple models** (baseline vs deep learning)
+4. ✅ **Evaluate performance** using standard metrics
+5. ✅ **Visualize results** with clear plots
 
----
+### Actual Implementation Status
+- ✅ **National-level forecasting** - 14-day ahead predictions
+- ✅ **3 models trained** - Naive, Seasonal Naive, DeepAR
+- ✅ **Comprehensive metrics** - RMSE, MAE, MAPE, sMAPE, Coverage
+- ✅ **Quality visualizations** - EDA + forecast plots with uncertainty
+- ✅ **Reproducible pipeline** - One command to run everything
 
-## 📊 Datasets
-
-### Required (Included)
-- **JHU CSSE US Confirmed Cases** - Daily cumulative cases by county
-- **JHU CSSE US Deaths** - Daily cumulative deaths by county
-- **JHU CSSE US Vaccines** - Vaccination data by state
-
-### Optional (Bonus)
-- **Google Mobility Data** - Movement trends for enhanced predictions
-
-**All datasets are already in the `data/` folder!**
-
-See **[DATASET_GUIDE.md](DATASET_GUIDE.md)** for detailed information.
+**Performance Achieved:**
+- DeepAR: RMSE ≈ 5,127 (41% better than baseline)
+- DeepAR: MAPE ≈ 12% (48% better than baseline)
 
 ---
 
-## 📈 Example Output
+## 🤖 Models & Datasets
 
-The pipeline generates:
+### Models Implemented
+
+| Model | Type | Purpose | Status |
+|-------|------|---------|--------|
+| **Naive Baseline** | Statistical | Simple benchmark | ✅ Working |
+| **Seasonal Naive** | Statistical | Weekly patterns | ✅ Working |
+| **DeepAR** | Deep Learning | Probabilistic forecasting | ✅ Working |
+
+### Data Sources
+
+| Dataset | Source | Usage | Status |
+|---------|--------|-------|--------|
+| **US Confirmed Cases** | JHU CSSE | Daily case counts | ✅ Included |
+| **US Deaths** | JHU CSSE | Daily death counts | ✅ Included |
+| **US Vaccines** | JHU CSSE | Vaccination data | ✅ Included |
+| **Mobility Data** | Google/ActiveConclusion | Movement trends | ✅ Available (not used in models yet) |
+
+---
+
+## 📈 Output Examples
+
+After running the pipeline, you'll have:
 
 ```
 results/
-├── eda_visualization.png          # 4-panel EDA plot
-├── baseline_forecasts.png         # Naive model forecasts
-├── deepar_forecast.png            # DeepAR predictions
-└── metrics.json                   # Evaluation metrics
+├── eda_visualization.png        # 4-panel trend analysis
+├── baseline_forecasts.png       # Naive model forecasts  
+├── baseline_metrics.csv         # Performance metrics
+├── deepar_forecast.png          # Neural network forecast with CI
+└── deepar_metrics.csv           # Detailed evaluation
 ```
 
-**Sample Forecast:**
-- 14-day ahead predictions
-- 10th, 50th, 90th percentile confidence intervals
-- Uncertainty bands visualized
-- CRPS metric for probabilistic evaluation
+**What the forecasts show:**
+- 📅 14-day ahead predictions
+- 📊 50% and 90% confidence intervals
+- 📈 Trend lines with uncertainty shading
+- 🎯 Actual values vs predictions
 
 ---
 

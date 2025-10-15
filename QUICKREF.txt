@@ -1,0 +1,129 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                 COVID-19 FORECASTING - QUICK REFERENCE                       ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📦 INITIAL SETUP (One Time Only)
+═══════════════════════════════════════════════════════════════════════════════
+
+  1. Create environment:     python3 -m venv venv
+  2. Activate it:            source venv/bin/activate
+  3. Install packages:       pip install -r requirements.txt
+
+
+🚀 QUICK START (Every Time)
+═══════════════════════════════════════════════════════════════════════════════
+
+  # Three simple commands:
+  cd covid-case-prediction
+  source venv/bin/activate
+  python run_pipeline.py
+
+  ⏱️  Takes: ~10-15 minutes
+  📊 Output: results/ folder with plots and metrics
+
+
+🔧 RUN INDIVIDUAL STEPS
+═══════════════════════════════════════════════════════════════════════════════
+
+  source venv/bin/activate                          # ALWAYS START WITH THIS!
+  
+  python src/data_processing/preprocess.py          # Download & clean data
+  python src/data_processing/prepare_gluonts.py     # Prepare time series
+  python src/visualization/create_eda_plots.py      # Create EDA plots
+  python src/models/train_baseline.py               # Train naive models
+  python src/models/train_deepar.py                 # Train neural network
+
+
+📊 VIEW RESULTS
+═══════════════════════════════════════════════════════════════════════════════
+
+  open results/deepar_forecast.png                  # View forecast plot
+  open results/                                     # View all results
+  cat results/deepar_metrics.csv                    # View metrics
+
+
+🐛 TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════════
+
+  Problem: "ModuleNotFoundError"
+  Fix:     source venv/bin/activate
+           pip install -r requirements.txt
+
+  Problem: Pipeline fails
+  Fix:     Run individual steps to find issue
+
+  Problem: Out of memory
+  Fix:     Edit src/models/train_deepar.py, set EPOCHS = 5
+
+
+📁 KEY FILES
+═══════════════════════════════════════════════════════════════════════════════
+
+  run_pipeline.py           → Main script (run everything)
+  requirements.txt          → Python dependencies
+  src/models/train_deepar.py → Neural network model
+  results/                  → All outputs here
+  
+  GETTING_STARTED.md        → Complete beginner guide
+  SETUP_COMPLETE.md         → Detailed setup & troubleshooting
+
+
+⚡ ONE-LINER FOR TESTING
+═══════════════════════════════════════════════════════════════════════════════
+
+  source venv/bin/activate && python run_pipeline.py
+
+
+🎯 COMMON WORKFLOWS
+═══════════════════════════════════════════════════════════════════════════════
+
+  Fresh Start:
+    rm -rf venv/ data/processed/ data/gluonts/ results/
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+    python run_pipeline.py
+
+  Quick Test:
+    source venv/bin/activate
+    python src/models/train_deepar.py
+
+  Just Visualize:
+    source venv/bin/activate
+    python src/visualization/create_eda_plots.py
+
+
+💡 PRO TIPS
+═══════════════════════════════════════════════════════════════════════════════
+
+  ✓ Always activate venv first: source venv/bin/activate
+  ✓ Check if activated: which python (should show venv/bin/python)
+  ✓ Deactivate when done: deactivate
+  ✓ Results in results/ folder - check there for outputs
+  ✓ Training verbose? Normal! Ignore warnings
+
+
+📈 EXPECTED RESULTS
+═══════════════════════════════════════════════════════════════════════════════
+
+  Baseline Model:  RMSE ≈ 8,700,  MAPE ≈ 23%
+  DeepAR Model:    RMSE ≈ 5,100,  MAPE ≈ 12%
+  
+  Files Created:   5 PNG images, 2 CSV metrics, processed data
+
+
+🆘 NEED HELP?
+═══════════════════════════════════════════════════════════════════════════════
+
+  1. Read GETTING_STARTED.md    (beginners guide)
+  2. Read SETUP_COMPLETE.md      (detailed troubleshooting)
+  3. Check MODEL_GUIDE.md        (understand models)
+  4. See REFERENCE.md            (all commands)
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  REMEMBER: Always start with  source venv/bin/activate  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
