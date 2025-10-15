@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  covid-forecasting:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: covid-forecasting:latest
+    container_name: covid-forecasting
+    
+    # Mount volumes to persist data and results
+    volumes:
+      - ./data:/app/data:ro              # Read-only data mount
+      - ./results:/app/results           # Results output
+      - ./models:/app/models             # Saved models
+      - ./notebooks:/app/notebooks       # Jupyter notebooks (if any)
+    
+    # Environment variables
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MXNET_ENGINE_TYPE=NaiveEngine   # For GluonTS/MXNet
+    
+    # Keep container running
+    stdin_open: true
+    tty: true
+    
+    # Optional: Expose Jupyter port
+    ports:
+      - "8888:8888"
+    
+    # Override default command (interactive shell)
+    command: /bin/bash
+    
+  # Optional: Jupyter notebook service
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: covid-forecasting:latest
+    container_name: covid-jupyter
+    
+    volumes:
+      - ./:/app
+    
+    ports:
+      - "8889:8888"
+    
+    environment:
+      - PYTHONUNBUFFERED=1
+    
+    command: jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+    
+    profiles:
+      - jupyter  # Only start with: docker-compose --profile jupyter up
+
