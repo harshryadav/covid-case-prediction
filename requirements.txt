@@ -3,11 +3,10 @@
 
 # Core Time Series Libraries
 gluonts>=0.14.0
-mxnet>=1.9.1
 
-# Alternative Backend (Optional - PyTorch)
-# torch>=2.0.0
-# gluonts[torch]>=0.14.0
+# Backend: PyTorch (MXNet not compatible with Python 3.10+)
+torch>=2.0.0
+lightning>=2.0.0
 
 # Data Manipulation & Analysis
 pandas>=1.5.0

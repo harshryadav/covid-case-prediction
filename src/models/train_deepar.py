@@ -3,18 +3,31 @@ Train DeepAR model for COVID-19 forecasting
 """
 
 import json
+import os
 from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# GluonTS imports
+# GluonTS imports (PyTorch backend)
 try:
     from gluonts.dataset.common import ListDataset
-    from gluonts.model.deepar import DeepAREstimator
-    from gluonts.trainer import Trainer
+    from gluonts.torch.model.deepar import DeepAREstimator
     from gluonts.evaluation import make_evaluation_predictions, Evaluator
+    import torch
+    BACKEND = "PyTorch"
+    
+    # Fix for macOS MPS device compatibility
+    # Use CPU for now as MPS doesn't support all operations
+    os.environ['PYTORCH_ENABLE_MPS_FALLBACK'] = '1'
+    if torch.backends.mps.is_available():
+        print("Note: Using CPU (MPS fallback enabled for compatibility)")
+        DEVICE = "cpu"
+    else:
+        DEVICE = "cpu"
+        
 except ImportError:
-    print("Error: GluonTS not installed. Run: pip install gluonts mxnet")
+    print("Error: GluonTS with PyTorch not installed.")
+    print("Run: pip install gluonts torch lightning")
     exit(1)
 
 
@@ -87,21 +100,24 @@ if __name__ == "__main__":
     train_ds, test_ds = create_datasets(df, metadata, test_days=60)
     print("✓ Data loaded")
     
-    # Initialize model
-    print("\n[2/4] Initializing DeepAR model...")
+    # Initialize model (PyTorch backend)
+    print(f"\n[2/4] Initializing DeepAR model ({BACKEND} backend on {DEVICE.upper()})...")
     estimator = DeepAREstimator(
         freq="D",
         prediction_length=PREDICTION_LENGTH,
         context_length=CONTEXT_LENGTH,
+        hidden_size=40,
         num_layers=2,
-        num_cells=40,
         dropout_rate=0.1,
-        trainer=Trainer(
-            epochs=EPOCHS,
-            learning_rate=1e-3,
-            batch_size=32,
-            num_batches_per_epoch=50
-        )
+        lr=1e-3,
+        batch_size=32,
+        num_batches_per_epoch=50,
+        trainer_kwargs={
+            "max_epochs": EPOCHS,
+            "enable_progress_bar": True,
+            "enable_model_summary": False,  # Reduce output verbosity
+            "accelerator": DEVICE
+        }
     )
     print("✓ Model initialized")
     
@@ -128,10 +144,14 @@ if __name__ == "__main__":
     print("\n" + "="*60)
     print("EVALUATION RESULTS")
     print("="*60)
-    print(f"RMSE:  {agg_metrics['RMSE']:.2f}")
-    print(f"MAE:   {agg_metrics['MAE']:.2f}")
-    print(f"MAPE:  {agg_metrics['MAPE']:.2%}")
-    print(f"sMAPE: {agg_metrics['sMAPE']:.2%}")
+    
+    # Display available metrics (different naming in PyTorch backend)
+    for key, value in agg_metrics.items():
+        if isinstance(value, (int, float)):
+            if 'MAPE' in key or 'sMAPE' in key or 'MASE' in key:
+                print(f"{key:20s}: {value:.2%}")
+            else:
+                print(f"{key:20s}: {value:.2f}")
     
     # Plot
     print("\n[5/5] Creating visualization...")
@@ -143,13 +163,13 @@ if __name__ == "__main__":
     # Plot last 90 days of actual data
     ts[-90:].plot(label='Actual', color='black', linewidth=2)
     
-    # Plot forecast
-    forecast.plot(prediction_intervals=[50, 90], color='blue')
+    # Plot forecast with confidence intervals
+    forecast.plot(color='C0')
     
     plt.title('COVID-19 Case Forecast (DeepAR Model)', fontsize=14, fontweight='bold')
     plt.ylabel('Daily Cases (7-day MA)')
     plt.xlabel('Date')
-    plt.legend(['Actual', 'Forecast (median)', '50% CI', '90% CI'])
+    plt.legend(['Actual', 'Forecast (median)', '90% CI', '50% CI'])
     plt.grid(alpha=0.3)
     plt.tight_layout()
     
