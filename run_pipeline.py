@@ -182,10 +182,30 @@ def run_deepvar_model():
     return True
 
 
+def run_wavenet_model():
+    """Train WaveNet model"""
+    print("\n" + "="*60)
+    print("STEP 8: WAVENET MODEL (Dilated CNN)")
+    print("="*60)
+    
+    import subprocess
+    result = subprocess.run(
+        [sys.executable, 'src/models/train_wavenet.py'],
+        capture_output=False
+    )
+    
+    if result.returncode != 0:
+        print("❌ WaveNet training failed!")
+        return False
+    
+    print("✅ WaveNet model trained")
+    return True
+
+
 def run_model_comparison():
     """Compare all trained models"""
     print("\n" + "="*60)
-    print("STEP 8: MODEL COMPARISON")
+    print("STEP 9: MODEL COMPARISON")
     print("="*60)
     
     import subprocess
@@ -207,7 +227,7 @@ def main():
     parser.add_argument(
         '--steps',
         nargs='+',
-        choices=['preprocess', 'gluonts', 'baseline', 'deepar', 'tft', 'prophet', 'deepvar', 'compare', 'all'],
+        choices=['preprocess', 'gluonts', 'baseline', 'deepar', 'tft', 'prophet', 'deepvar', 'wavenet', 'compare', 'all'],
         default=['all'],
         help='Which steps to run (default: all)'
     )
@@ -240,7 +260,7 @@ def main():
         steps = ['preprocess', 'gluonts', 'baseline', 'deepar', 'compare']
         print("\n🚀 Quick mode: Running baseline + DeepAR only")
     elif 'all' in steps:
-        steps = ['preprocess', 'gluonts', 'baseline', 'deepar', 'tft', 'prophet', 'deepvar', 'compare']
+        steps = ['preprocess', 'gluonts', 'baseline', 'deepar', 'tft', 'prophet', 'wavenet', 'compare']
     
     # Run steps
     success = True
@@ -267,6 +287,10 @@ def main():
     
     if success and 'prophet' in steps:
         if not run_prophet_model():
+            success = False
+    
+    if success and 'wavenet' in steps:
+        if not run_wavenet_model():
             success = False
     
     if success and 'deepvar' in steps:

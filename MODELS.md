@@ -251,6 +251,12 @@ This generates:
 - You want interpretable trend + seasonality decomposition
 - You have limited computational resources
 
+**Use WaveNet if**:
+- You want CNN-based temporal modeling
+- You need a large receptive field efficiently
+- You're interested in dilated convolutions for time series
+- You want an alternative to RNN/attention architectures
+
 **Use DeepVAR if**:
 - ⚠️ **NOT AVAILABLE** - DeepVAREstimator not in PyTorch backend
 - Only available in MXNet backend (incompatible with Python 3.10+)
