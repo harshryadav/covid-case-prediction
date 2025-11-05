@@ -105,7 +105,7 @@ def run_deepar_model():
         import gluonts
     except ImportError:
         print("⚠️  GluonTS not installed. Skipping DeepAR training.")
-        print("    Install with: pip install gluonts mxnet")
+        print("    Install with: pip install gluonts torch lightning")
         return True  # Not a failure, just skipped
     
     import subprocess
@@ -122,12 +122,92 @@ def run_deepar_model():
     return True
 
 
+def run_tft_model():
+    """Train Temporal Fusion Transformer model"""
+    print("\n" + "="*60)
+    print("STEP 5: TEMPORAL FUSION TRANSFORMER (TFT)")
+    print("="*60)
+    
+    import subprocess
+    result = subprocess.run(
+        [sys.executable, 'src/models/train_tft.py'],
+        capture_output=False
+    )
+    
+    if result.returncode != 0:
+        print("❌ TFT training failed!")
+        return False
+    
+    print("✅ TFT model trained")
+    return True
+
+
+def run_prophet_model():
+    """Train Prophet model"""
+    print("\n" + "="*60)
+    print("STEP 6: PROPHET MODEL")
+    print("="*60)
+    
+    import subprocess
+    result = subprocess.run(
+        [sys.executable, 'src/models/train_prophet.py'],
+        capture_output=False
+    )
+    
+    if result.returncode != 0:
+        print("❌ Prophet training failed!")
+        return False
+    
+    print("✅ Prophet model trained")
+    return True
+
+
+def run_deepvar_model():
+    """Train DeepVAR multivariate model"""
+    print("\n" + "="*60)
+    print("STEP 7: DEEPVAR MODEL (Multivariate)")
+    print("="*60)
+    
+    import subprocess
+    result = subprocess.run(
+        [sys.executable, 'src/models/train_deepvar.py'],
+        capture_output=False
+    )
+    
+    if result.returncode != 0:
+        print("❌ DeepVAR training failed!")
+        return False
+    
+    print("✅ DeepVAR model trained")
+    return True
+
+
+def run_model_comparison():
+    """Compare all trained models"""
+    print("\n" + "="*60)
+    print("STEP 8: MODEL COMPARISON")
+    print("="*60)
+    
+    import subprocess
+    result = subprocess.run(
+        [sys.executable, 'src/models/compare_models.py'],
+        capture_output=False
+    )
+    
+    if result.returncode != 0:
+        print("⚠️  Model comparison failed (but models trained)")
+        return True  # Don't fail entire pipeline
+    
+    print("✅ Model comparison complete")
+    return True
+
+
 def main():
     parser = argparse.ArgumentParser(description='Run COVID-19 forecasting pipeline')
     parser.add_argument(
         '--steps',
         nargs='+',
-        choices=['preprocess', 'gluonts', 'baseline', 'deepar', 'all'],
+        choices=['preprocess', 'gluonts', 'baseline', 'deepar', 'tft', 'prophet', 'deepvar', 'compare', 'all'],
         default=['all'],
         help='Which steps to run (default: all)'
     )
@@ -135,6 +215,11 @@ def main():
         '--skip-check',
         action='store_true',
         help='Skip data existence check'
+    )
+    parser.add_argument(
+        '--quick',
+        action='store_true',
+        help='Quick mode: only baseline and DeepAR'
     )
     
     args = parser.parse_args()
@@ -151,8 +236,11 @@ def main():
     
     # Determine which steps to run
     steps = args.steps
-    if 'all' in steps:
-        steps = ['preprocess', 'gluonts', 'baseline', 'deepar']
+    if args.quick:
+        steps = ['preprocess', 'gluonts', 'baseline', 'deepar', 'compare']
+        print("\n🚀 Quick mode: Running baseline + DeepAR only")
+    elif 'all' in steps:
+        steps = ['preprocess', 'gluonts', 'baseline', 'deepar', 'tft', 'prophet', 'deepvar', 'compare']
     
     # Run steps
     success = True
@@ -173,6 +261,21 @@ def main():
         if not run_deepar_model():
             success = False
     
+    if success and 'tft' in steps:
+        if not run_tft_model():
+            success = False
+    
+    if success and 'prophet' in steps:
+        if not run_prophet_model():
+            success = False
+    
+    if success and 'deepvar' in steps:
+        if not run_deepvar_model():
+            success = False
+    
+    if success and 'compare' in steps:
+        run_model_comparison()  # Don't fail pipeline if comparison fails
+    
     # Summary
     print("\n" + "="*60)
     if success:
@@ -181,12 +284,16 @@ def main():
         print("\nResults saved to:")
         print("  - results/baseline_forecasts.png")
         print("  - results/baseline_metrics.csv")
-        print("  - results/deepar_forecast.png (if DeepAR ran)")
-        print("  - results/deepar_metrics.csv (if DeepAR ran)")
+        print("  - results/deepar_forecast.png")
+        print("  - results/tft_forecast.png")
+        print("  - results/prophet_forecast.png")
+        print("  - results/deepvar_forecast.png")
+        print("  - results/model_comparison.csv")
+        print("  - results/model_comparison.png")
         print("\nNext steps:")
-        print("  1. Review results in results/ directory")
-        print("  2. Experiment with hyperparameters")
-        print("  3. Try adding mobility data as covariates")
+        print("  1. View comparison: open results/model_comparison.png")
+        print("  2. Review rankings: cat results/model_rankings.csv")
+        print("  3. Experiment with hyperparameters")
         return 0
     else:
         print("❌ PIPELINE FAILED")

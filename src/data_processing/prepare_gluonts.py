@@ -13,7 +13,9 @@ def create_gluonts_dataset(
     target_column='Daily_MA7',
     start_date=None,
     freq='D',
-    prediction_length=14
+    prediction_length=14,
+    multivariate=False,
+    mobility_columns=None
 ):
     """
     Convert pandas DataFrame to GluonTS ListDataset
@@ -24,6 +26,8 @@ def create_gluonts_dataset(
         start_date: Start date (if None, uses first date in df)
         freq: Frequency string ('D' for daily)
         prediction_length: Forecast horizon
+        multivariate: If True, create multivariate dataset (for DeepVAR)
+        mobility_columns: List of mobility column names for multivariate
         
     Returns:
         GluonTS ListDataset
@@ -31,14 +35,38 @@ def create_gluonts_dataset(
     if start_date is None:
         start_date = pd.Timestamp(df['Date'].iloc[0])
     
-    # Get target values
-    target = df[target_column].fillna(0).values
+    # Default mobility columns
+    if mobility_columns is None:
+        mobility_columns = [
+            'retail and recreation', 'grocery and pharmacy',
+            'parks', 'transit stations', 'workplaces', 'residential'
+        ]
     
-    # Create dataset
-    data = [{
-        "start": start_date,
-        "target": target.tolist()
-    }]
+    if multivariate:
+        # Create multivariate target (cases + mobility features)
+        # Stack target with mobility data
+        target_cols = [target_column] + [col for col in mobility_columns if col in df.columns]
+        
+        # Fill NaN values
+        target_data = df[target_cols].fillna(method='ffill').fillna(0)
+        
+        # Convert to 2D array (num_features x time_steps)
+        target = target_data.values.T.tolist()
+        
+        # Create dataset
+        data = [{
+            "start": start_date,
+            "target": target
+        }]
+    else:
+        # Univariate (original behavior)
+        target = df[target_column].fillna(0).values
+        
+        # Create dataset
+        data = [{
+            "start": start_date,
+            "target": target.tolist()
+        }]
     
     return ListDataset(data, freq=freq)
 

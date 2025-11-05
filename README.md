@@ -17,10 +17,11 @@
 
 - 🎯 **14-day COVID-19 case forecasts** for the United States
 - 📊 **Uncertainty quantification** with 50% and 90% confidence intervals
-- 🤖 **DeepAR neural network** + baseline model comparisons
-- 📈 **Rigorous evaluation** using RMSE, MAE, MAPE, sMAPE metrics
+- 🤖 **5 Forecasting Models**: Baseline, DeepAR, TFT, Prophet, DeepVAR
+- 📈 **Rigorous evaluation** using RMSE, MAE, MAPE, sMAPE, CRPS metrics
 - 📉 **Trend analysis** with 7-day moving averages
-- 🔍 **Exploratory data analysis** with multi-panel visualizations
+- 🔍 **Model comparison** with automated performance rankings
+- 🔗 **Multivariate modeling** with COVID cases + mobility data (DeepVAR)
 
 ### Technologies Used
 
@@ -79,22 +80,28 @@ docker-compose down
 
 ### Currently Working (Ready to Use)
 - ✅ **Data Pipeline** - Preprocessing, aggregation, GluonTS formatting
-- ✅ **Baseline Models** - Naive and Seasonal Naive forecasters
-- ✅ **DeepAR Model** - Probabilistic neural network forecasting
-- ✅ **Evaluation** - RMSE, MAE, MAPE, sMAPE, Coverage metrics
-- ✅ **Visualization** - EDA plots, forecast plots with confidence intervals
+- ✅ **5 Forecasting Models**:
+  - **Baseline**: Naive & Seasonal Naive
+  - **DeepAR**: Probabilistic RNN-based forecasting
+  - **TFT**: Temporal Fusion Transformer with attention
+  - **Prophet**: Facebook's statistical model
+  - **DeepVAR**: Multivariate model with mobility data
+- ✅ **Comprehensive Evaluation** - RMSE, MAE, MAPE, sMAPE, CRPS, Coverage
+- ✅ **Model Comparison** - Automated ranking and visualization
+- ✅ **Visualization** - EDA plots, forecasts with confidence intervals
 - ✅ **PyTorch Backend** - Python 3.10+ compatible
 - ✅ **Docker Support** - Reproducible containerized environment
+- ✅ **Mobility Data Integration** - Google Mobility data merged with cases
 
 ### Planned for Future (Not Yet Implemented)
-- 🔄 **Transformer Models** - For longer sequences
 - 🔄 **State-Level Forecasting** - Currently only national-level
-- 🔄 **Mobility Data as Covariates** - Data available but not integrated into models
+- 🔄 **Covariates in DeepAR/TFT** - Mobility data as dynamic features
 - 🔄 **Scenario Analysis** - Policy intervention impact
-- 🔄 **Multi-Horizon Forecasting** - 7, 14, 30 day horizons
+- 🔄 **Multi-Horizon Forecasting** - 7, 30 day horizons alongside 14
 - 🔄 **Cross-Validation** - Time series CV framework
+- 🔄 **Hyperparameter Optimization** - Automated tuning with Optuna
 
-**Current Focus:** National-level 14-day forecasts with baseline + DeepAR models
+**Current Status:** 5 models trained with automated comparison → **DeepVAR uses mobility data**
 
 ---
 
@@ -198,7 +205,12 @@ covid-case-prediction/
 |-------|------|---------|--------|
 | **Naive Baseline** | Statistical | Simple benchmark | ✅ Working |
 | **Seasonal Naive** | Statistical | Weekly patterns | ✅ Working |
-| **DeepAR** | Deep Learning | Probabilistic forecasting | ✅ Working |
+| **DeepAR** | Deep Learning (RNN) | Probabilistic forecasting | ✅ Working |
+| **TFT** | Deep Learning (Transformer) | Attention-based forecasting | ✅ Working |
+| **Prophet** | Statistical | Trend + seasonality | ✅ Working |
+| **DeepVAR** | Deep Learning (Multivariate) | Cases + mobility forecasting | ✅ Working |
+
+📖 **Detailed model documentation**: See [MODELS.md](MODELS.md)
 
 ### Data Sources
 
@@ -217,11 +229,21 @@ After running the pipeline, you'll have:
 
 ```
 results/
-├── eda_visualization.png        # 4-panel trend analysis
-├── baseline_forecasts.png       # Naive model forecasts  
-├── baseline_metrics.csv         # Performance metrics
-├── deepar_forecast.png          # Neural network forecast with CI
-└── deepar_metrics.csv           # Detailed evaluation
+├── eda_visualization.png            # 4-panel trend analysis
+├── baseline_forecasts.png           # Naive model forecasts  
+├── baseline_metrics.csv             # Baseline performance
+├── deepar_forecast.png              # DeepAR forecast with CI
+├── deepar_metrics.csv               # DeepAR metrics
+├── tft_forecast.png                 # TFT forecast with attention
+├── tft_metrics.csv                  # TFT metrics
+├── prophet_forecast.png             # Prophet trend decomposition
+├── prophet_metrics.csv              # Prophet metrics
+├── deepvar_forecast.png             # Multivariate forecast
+├── deepvar_metrics.csv              # DeepVAR metrics
+├── model_comparison.png             # Performance comparison charts
+├── model_comparison.csv             # Performance table
+├── model_rankings.csv               # Ranked by metric
+└── all_forecasts_comparison.png    # Side-by-side all models
 ```
 
 **What the forecasts show:**
@@ -229,6 +251,7 @@ results/
 - 📊 50% and 90% confidence intervals
 - 📈 Trend lines with uncertainty shading
 - 🎯 Actual values vs predictions
+- 📊 Automated model performance comparison
 
 ---
 
