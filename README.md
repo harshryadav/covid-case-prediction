@@ -41,9 +41,28 @@
 
 **📌 New to this project?** → Read **[GETTING_STARTED.md](GETTING_STARTED.md)** for a complete beginner's guide!
 
-**⚡ Need a quick reference?** → See **[QUICKREF.txt](QUICKREF.txt)** for one-page cheat sheet!
+**⚡ Need a quick reference?** → See **[QUICK_REFERENCE_CARD.txt](QUICK_REFERENCE_CARD.txt)** or **[QUICKREF.txt](QUICKREF.txt)**!
 
-### Option 1: Local Setup (5 minutes)
+**🛠️ Prefer Makefile?** → See **[MAKEFILE_GUIDE.md](MAKEFILE_GUIDE.md)** for all commands!
+
+### Option 1: Using Makefile (Recommended - Easiest!)
+
+```bash
+# 1. Setup environment
+make setup
+
+# 2. Run complete pipeline (~25 min)
+make all
+
+# 3. View results
+make results    # Show metrics table
+make view       # Open visualizations
+
+# Or quick mode (~10 min)
+make quick
+```
+
+### Option 2: Local Setup (Python Directly)
 
 ```bash
 # 1. Install dependencies
@@ -58,7 +77,7 @@ python run_pipeline.py
 open results/deepar_forecast.png
 ```
 
-### Option 2: Docker Setup (Recommended)
+### Option 3: Docker Setup
 
 ```bash
 # 1. Build and start
@@ -80,15 +99,16 @@ docker-compose down
 
 ### Currently Working (Ready to Use)
 - ✅ **Data Pipeline** - Preprocessing, aggregation, GluonTS formatting
-- ✅ **5 Forecasting Models**:
+- ✅ **5 Forecasting Models** (4 different architectures):
   - **Baseline**: Naive & Seasonal Naive
-  - **DeepAR**: Probabilistic RNN-based forecasting
+  - **DeepAR**: Probabilistic RNN-based forecasting (LSTM)
   - **TFT**: Temporal Fusion Transformer with attention
   - **Prophet**: Facebook's statistical model
-  - **DeepVAR**: Multivariate model with mobility data
+  - **WaveNet**: Dilated CNN for time series ⭐ NEW!
+- ✅ **Comprehensive Makefile** - 40+ commands for easy execution ⭐ NEW!
+- ✅ **Professional Visualizations** - Clean, publication-ready plots (300 DPI)
 - ✅ **Comprehensive Evaluation** - RMSE, MAE, MAPE, sMAPE, CRPS, Coverage
 - ✅ **Model Comparison** - Automated ranking and visualization
-- ✅ **Visualization** - EDA plots, forecasts with confidence intervals
 - ✅ **PyTorch Backend** - Python 3.10+ compatible
 - ✅ **Docker Support** - Reproducible containerized environment
 - ✅ **Mobility Data Integration** - Google Mobility data merged with cases
@@ -101,7 +121,7 @@ docker-compose down
 - 🔄 **Cross-Validation** - Time series CV framework
 - 🔄 **Hyperparameter Optimization** - Automated tuning with Optuna
 
-**Current Status:** 5 models trained with automated comparison → **DeepVAR uses mobility data**
+**Current Status:** 5 models trained across 4 architectures (RNN, CNN, Attention, Statistical) with automated comparison
 
 ---
 

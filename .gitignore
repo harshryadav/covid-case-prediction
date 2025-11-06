@@ -61,7 +61,9 @@ data/gluonts/
 
 # Model Outputs & Results
 results/
-models/
+# Note: Ignore trained model files, but NOT source code in src/models/
+# models/  # ← This was too broad, ignoring src/models/ source code!
+/trained_models/  # Only ignore root-level trained models directory
 lightning_logs/
 *.ckpt
 *.pkl
