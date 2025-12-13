@@ -155,6 +155,8 @@ def load_covid_data_for_gluonts(
     
     # Step 6: Convert to GluonTS format
     print("\n🔄 Converting to GluonTS format...")
+    
+    # Train dataset: only training period
     train_ds = create_gluonts_dataset(
         df=train_df,
         target_column=target_column,
@@ -163,8 +165,10 @@ def load_covid_data_for_gluonts(
         past_feat_columns=feature_columns
     )
     
+    # Test dataset: FULL DATA (train + test) - GluonTS needs full history for prediction!
+    # This is the key fix: test_ds should contain the entire time series
     test_ds = create_gluonts_dataset(
-        df=test_df,
+        df=merged_df.dropna(subset=[target_column]),  # Use full merged data, not just test_df
         target_column=target_column,
         freq='D',
         prediction_length=prediction_length,
@@ -172,6 +176,7 @@ def load_covid_data_for_gluonts(
     )
     
     print("✓ GluonTS datasets created")
+    print("  Note: Test dataset contains full time series (train + test periods)")
     
     # Prepare return info
     info = {
