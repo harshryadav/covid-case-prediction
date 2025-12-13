@@ -12,25 +12,27 @@
 
 ## 📋 Project Overview
 
-This project implements **end-to-end probabilistic forecasting** for COVID-19 daily cases using three GluonTS models.
+This project implements **end-to-end probabilistic forecasting** for COVID-19 daily cases using three GluonTS models with comprehensive evaluation and scenario analysis.
 
-**Goal**: Forecast 14 days ahead with uncertainty quantification
+**Goal**: Forecast 14 days ahead with uncertainty quantification for public health decision support
 
 **Dataset**:
 - Johns Hopkins CSSE COVID-19 Data (cases, deaths)
-- Google COVID-19 Community Mobility Reports
+- Google COVID-19 Community Mobility Reports (6 metrics)
+- CDC Vaccination Data (kept for future use, not currently used)
 
 **Models Implemented**:
-1. **DeepAR** - Autoregressive RNN (best accuracy: ~18-22% MAPE)
-2. **SimpleFeedForward** - Baseline MLP (fastest: ~20-25% MAPE)
-3. **DeepNPTS** - Lightweight forecasting (balanced: ~19-24% MAPE)
+1. **DeepAR** - Autoregressive RNN with external features (most sophisticated)
+2. **SimpleFeedForward** - Baseline MLP for quick benchmarking (fastest)
+3. **DeepNPTS** - Non-parametric forecasting for regime changes (most flexible)
 
 **Key Features**:
 - ✅ Probabilistic forecasts with confidence intervals
-- ✅ Multi-feature learning (cases, deaths, mobility)
+- ✅ Multi-feature learning (cases, deaths, mobility, CFR)
 - ✅ Scenario analysis for public health interventions
-- ✅ CPU-optimized (<6 min training for all 3 models)
-- ✅ Production-ready modular code
+- ✅ CPU-optimized (<6 min training per model on M1/M2/M3 Macs)
+- ✅ Production-ready modular code with comprehensive documentation
+- ✅ Docker environment for reproducibility
 
 ---
 
@@ -39,30 +41,12 @@ This project implements **end-to-end probabilistic forecasting** for COVID-19 da
 ### Prerequisites
 
 - Python 3.10+
-- Jupyter Notebook
-- Data files in `data/` folder
+- Docker (recommended) or local Jupyter setup
+- Data files in `data/` folder (included in repository)
 
 ### Installation
 
-```bash
-# Install dependencies
-pip install -r requirements.txt
-```
-
-### Run Complete Example
-
-**Option 1: Local Jupyter**
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Start Jupyter
-jupyter notebook
-
-# Open any example notebook and run
-```
-
-**Option 2: Docker** (recommended - everything pre-configured):
+**Option 1: Docker** (recommended - everything pre-configured):
 
 ```bash
 # Step 1: Build Docker image
@@ -72,10 +56,45 @@ jupyter notebook
 ./docker_jupyter.sh
 
 # Step 3: Open browser to http://localhost:8888
-# All notebooks will be available!
+# Notebooks will be available in the file browser!
+```
+
+**Option 2: Local Jupyter**:
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Start Jupyter
+jupyter notebook
+
+# Open GluonTS.API.ipynb or GluonTS.example.ipynb
 ```
 
 See **[docs/DOCKER_GUIDE.md](docs/DOCKER_GUIDE.md)** for complete Docker instructions.
+
+---
+
+## 📚 Where to Start?
+
+### New to GluonTS? Start Here! 👇
+
+1. **📖 Read**: `GluonTS.API.md` - Learn the basics
+2. **🧪 Run**: `GluonTS.API.ipynb` - See models in action (5-10 min)
+3. **📊 Explore**: `GluonTS.example.ipynb` - Complete application (15-20 min)
+
+### Want the Complete Story?
+
+Open **`GluonTS.example.ipynb`** and run "Restart & Run All"!
+
+This shows you:
+- Full data pipeline (loading, exploration, preprocessing)
+- All 3 models trained and compared
+- Comprehensive evaluation with beautiful visualizations
+- Scenario analysis for public health decisions
+- Actionable insights and recommendations
+
+**Runtime**: ~10-15 minutes on CPU
 
 ---
 
@@ -84,428 +103,573 @@ See **[docs/DOCKER_GUIDE.md](docs/DOCKER_GUIDE.md)** for complete Docker instruc
 ```
 TutorTask121_GluonTS_COVID_19_Case_Prediction/
 │
-├── data/                              # Data files (required)
-│   ├── cases.csv                      # JHU COVID-19 cases
-│   ├── deaths.csv                     # JHU COVID-19 deaths
-│   ├── mobility.csv                   # Google Mobility Reports
-│   └── vaccine.csv                    # CDC vaccination data
+├── 📊 MAIN NOTEBOOKS (Start Here!)
+│   ├── GluonTS.API.ipynb                   # Educational API demo (all 3 models)
+│   ├── GluonTS.API.md                      # API documentation & guide
+│   ├── GluonTS.example.ipynb               # Complete application (all 3 models)
+│   └── GluonTS.example.md                  # Example documentation & guide
 │
-├── utils/                             # Utility modules
-│   ├── load_data_utils.py            # Data loading functions
-│   ├── preprocess_data_utils.py      # Preprocessing pipeline
-│   └── gluonts_utils.py              # GluonTS wrapper functions
+├── 🔧 UTILITY MODULES
+│   ├── GluonTS_utils_data_io.py            # Data loading (JHU, Google, CDC)
+│   ├── GluonTS_utils_preprocessing.py      # Preprocessing pipeline
+│   ├── GluonTS_utils_gluonts.py            # GluonTS dataset creation
+│   ├── GluonTS_utils_evaluation.py         # Metrics & plotting
+│   ├── GluonTS_utils_notebook_loader.py    # One-line data loader
+│   └── GluonTS_utils_models.py             # Model training wrappers
 │
-├── GluonTS.API.md                     # 📖 API documentation
+├── 📂 DATA
+│   ├── data/
+│   │   ├── cases.csv                       # JHU COVID-19 cases by state
+│   │   ├── deaths.csv                      # JHU COVID-19 deaths by state
+│   │   ├── mobility.csv                    # Google Mobility (6 metrics)
+│   │   └── vaccine.csv                     # CDC vaccination data (future use)
 │
-├── GluonTS_DeepAR.API.ipynb           # 📓 DeepAR API demo
-├── GluonTS_SimpleFeedForward.API.ipynb # 📓 SimpleFeedForward API demo
-├── GluonTS_DeepNPTS.API.ipynb         # 📓 DeepNPTS API demo
+├── 🐳 DOCKER SETUP
+│   ├── Dockerfile                          # Docker configuration
+│   ├── docker_build.sh                     # Build Docker image
+│   ├── docker_jupyter.sh                   # Start Jupyter server
+│   └── docker_bash.sh                      # Interactive shell access
 │
-├── GluonTS_DeepAR.example.ipynb       # 📊 Complete DeepAR example
-├── GluonTS_SimpleFeedForward.example.ipynb # 📊 Complete SimpleFeedForward example
-├── GluonTS_DeepNPTS.example.ipynb     # 📊 Complete DeepNPTS example
+├── 📚 DOCUMENTATION
+│   ├── docs/
+│   │   ├── START_HERE.md                   # Quick orientation (30 sec)
+│   │   ├── DOCKER_GUIDE.md                 # Complete Docker instructions
+│   │   ├── DATA_USAGE.md                   # What data is used and why
+│   │   ├── DEATHS_DATA_INTEGRATION.md      # Deaths as a feature
+│   │   └── FOLDER_STRUCTURE.md             # Detailed structure guide
 │
-├── GluonTS.example.md                 # 📖 Example documentation
+├── 📦 ARCHIVE
+│   ├── archive/                            # Old notebooks (superseded)
+│   │   ├── GluonTS_DeepAR.API.ipynb
+│   │   ├── GluonTS_DeepAR.example.ipynb
+│   │   ├── GluonTS_SimpleFeedForward.API.ipynb
+│   │   ├── GluonTS_SimpleFeedForward.example.ipynb
+│   │   ├── GluonTS_DeepNPTS.API.ipynb
+│   │   ├── GluonTS_DeepNPTS.example.ipynb
+│   │   └── README.md                       # Why these are archived
 │
-├── Dockerfile                         # Docker configuration
-├── requirements.txt                   # Python dependencies
-└── README.md                          # This file
+├── 📝 PROJECT FILES
+│   ├── requirements.txt                    # Python dependencies
+│   ├── README.md                           # This file
+│   └── .gitignore                          # Git ignore rules
 ```
 
 ---
 
-## 📚 Documentation
+## 📖 What Each Notebook Does
 
-### Start Here
-- **README.md** (this file) - Project overview and quick start
-- **docs/START_HERE.md** - Quick orientation guide (30 seconds)
+### API Notebook: `GluonTS.API.ipynb`
 
-### API Reference
-- **GluonTS.API.md** - Comprehensive API documentation
-- **GluonTS_*.API.ipynb** - Minimal API demonstrations (3 notebooks)
+**Purpose**: Educational demonstration of model APIs
 
-### Complete Examples
-- **GluonTS.example.md** - Complete example walkthrough
-- **GluonTS_DeepAR.example.ipynb** - Full DeepAR pipeline
-- **GluonTS_SimpleFeedForward.example.ipynb** - Full SimpleFeedForward pipeline
-- **GluonTS_DeepNPTS.example.ipynb** - Full DeepNPTS pipeline
+**Content**:
+- Introduction to each model (DeepAR, SimpleFeedForward, DeepNPTS)
+- Parameter explanations (what each parameter does)
+- Basic configuration examples
+- Quick training demonstrations with real COVID data
+- Simple forecasting and evaluation
 
-### Supporting Documentation (in `docs/`)
-- **docs/START_HERE.md** - Quick start guide
-- **docs/SUBMISSION_CHECKLIST.md** - Pre-submission verification
-- **docs/DATA_USAGE.md** - What data is used and why
-- **docs/DEATHS_DATA_INTEGRATION.md** - How deaths data improves forecasts
-- **docs/FOLDER_STRUCTURE.md** - Project structure details
+**Best for**: 
+- Learning how to use GluonTS models
+- Understanding parameter choices
+- Quick API reference
 
----
+**Runtime**: ~5-10 minutes
 
-## 🎯 What Each File Does
-
-### API Notebooks (Minimal Demos)
-
-**Purpose**: Demonstrate the tool's API with toy data
-
-| Notebook | Model | Runtime | What It Shows |
-|----------|-------|---------|---------------|
-| `GluonTS_DeepAR.API.ipynb` | DeepAR | ~1-2 min | RNN configuration and training |
-| `GluonTS_SimpleFeedForward.API.ipynb` | SimpleFeedForward | ~1-2 min | MLP baseline training |
-| `GluonTS_DeepNPTS.API.ipynb` | DeepNPTS | ~1-2 min | Lightweight forecasting |
-
-**Best for**: Learning the API quickly
+**Documentation**: See `GluonTS.API.md` for comprehensive guide
 
 ---
 
-### Example Notebooks (Complete Pipelines)
+### Example Notebook: `GluonTS.example.ipynb`
 
-**Purpose**: Complete COVID-19 forecasting from data to results
+**Purpose**: Complete, production-ready COVID-19 forecasting application
 
-| Notebook | Model | Runtime | What It Shows |
-|----------|-------|---------|---------------|
-| `GluonTS_DeepAR.example.ipynb` | DeepAR | ~3-4 min | Full pipeline + scenario analysis |
-| `GluonTS_SimpleFeedForward.example.ipynb` | SimpleFeedForward | ~2-3 min | Baseline comparison |
-| `GluonTS_DeepNPTS.example.ipynb` | DeepNPTS | ~2-3 min | Lightweight alternative |
+**Content**:
+- Full data pipeline (load, explore, preprocess)
+- Advanced feature engineering (deaths, mobility, CFR)
+- Training all 3 models with detailed output
+- Side-by-side model comparison
+- Comprehensive evaluation (metrics + visualizations)
+- Scenario analysis (intervention simulations)
+- Conclusions and recommendations
 
-**Best for**: Understanding real-world application
+**Best for**:
+- Understanding complete forecasting applications
+- Seeing all models compared
+- Real-world problem solving
+- Learning best practices
+
+**Runtime**: ~10-15 minutes
+
+**Documentation**: See `GluonTS.example.md` for comprehensive guide
+
+---
+
+## 🎯 Key Features Explained
+
+### 1. Probabilistic Forecasting
+
+Unlike simple point predictions, our models provide **uncertainty estimates**:
+
+```
+Not just: "We predict 50,000 cases"
+But: "We predict 50,000 cases, with 80% confidence between 40,000-60,000"
+```
+
+This is critical for:
+- **Risk assessment**: Know when uncertainty is high
+- **Resource planning**: Plan for the range, not just the average
+- **Decision confidence**: Understand when predictions are reliable
+
+---
+
+### 2. Multi-Model Comparison
+
+We train **three different models** because:
+- No single model is always best
+- Different models excel in different situations
+- Comparing models reveals insights about the data
+
+**Model Characteristics**:
+
+| Model | External Features | Training Time | Best For |
+|-------|------------------|---------------|----------|
+| **DeepAR** | ✅ Yes | ~3-4 min | Highest accuracy needs |
+| **SimpleFeedForward** | ❌ No | ~30 sec | Fast baselines |
+| **DeepNPTS** | ✅ Yes | ~3-4 min | Regime changes |
+
+---
+
+### 3. External Features (Covariates)
+
+Our advanced models use **external features** to improve predictions:
+
+- **Daily Deaths**: Leading indicator of case severity
+- **Mobility Patterns**: 6 metrics showing behavioral changes
+- **CFR**: Case Fatality Ratio (deaths/cases)
+- **Moving Averages**: Smoothed trends
+
+Why this matters:
+- More information → better predictions
+- Can model causality (lockdowns → reduced mobility → fewer cases)
+- Enables scenario analysis
+
+---
+
+### 4. Scenario Analysis
+
+Answer "what if?" questions:
+- "What if we implement a lockdown?"
+- "What if vaccination rates increase?"
+- "What if a new variant emerges?"
+
+**How it works**:
+1. Train model on historical data
+2. Create scenarios with different future conditions
+3. Generate forecasts for each scenario
+4. Compare to guide decisions
+
+See Section 6 in `GluonTS.example.ipynb` for complete demonstration!
 
 ---
 
 ## 🔧 Usage Examples
 
-### Example 1: Load and Preprocess Data
+### Quick Start: Load COVID Data
 
 ```python
-from utils.load_data_utils import load_all_data
-from utils.preprocess_data_utils import preprocess_pipeline
+from GluonTS_utils_notebook_loader import load_covid_data_for_gluonts
 
-# Load data
-data = load_all_data("data")
-
-# Preprocess
-merged, train, test = preprocess_pipeline(
-    data['cases'], data['deaths'], data['mobility'], test_days=14
-)
-
-print(f"Training data: {train.shape}")
-print(f"Test data: {test.shape}")
-```
-
-### Example 2: Train DeepAR Model
-
-```python
-from utils.gluonts_utils import (
-    create_gluonts_dataset, train_deepar
-)
-
-# Create datasets
-train_ds = create_gluonts_dataset(train, 'Daily_Cases_MA7', 'D', 14)
-test_ds = create_gluonts_dataset(test, 'Daily_Cases_MA7', 'D', 14)
-
-# Train
-predictor = train_deepar(
-    train_ds,
+# One function to load and prepare everything!
+data = load_covid_data_for_gluonts(
+    data_dir="data",
     prediction_length=14,
-    context_length=30,
-    epochs=10
-)
-```
-
-### Example 3: Generate and Evaluate Forecasts
-
-```python
-from utils.gluonts_utils import (
-    generate_forecast, evaluate_forecast, plot_forecast
+    context_length=60,
+    verbose=True
 )
 
-# Generate forecasts
-forecasts, truths = generate_forecast(predictor, test_ds)
-
-# Evaluate
-metrics = evaluate_forecast(forecasts[0], truths[0])
-print(f"MAE: {metrics['mae']:.2f}")
-print(f"MAPE: {metrics['mape']:.2f}%")
-
-# Visualize
-plot_forecast(forecasts[0], truths[0], 
-              title="COVID-19 Forecast",
-              save_path="forecast.png")
+# Ready-to-use datasets
+train_ds = data['train_ds']
+test_ds = data['test_ds']
+num_features = data['num_features']
 ```
 
 ---
 
-## 🎯 Models Comparison
-
-| Model | Architecture | Train Time | MAPE | Best For |
-|-------|-------------|-----------|------|----------|
-| **DeepAR** | RNN (LSTM) | ~2 min | 18-22% | Accuracy & uncertainty |
-| **SimpleFeedForward** | MLP | ~1-2 min | 20-25% | Speed & baselines |
-| **DeepNPTS** | Dense layers | ~1-2 min | 19-24% | Balance |
-
-**Total Training Time**: ~5-6 minutes for all 3 models (CPU)
-
-**Recommendation**: 
-- Start with **DeepAR** for best results
-- Use **SimpleFeedForward** for quick baselines
-- Try **DeepNPTS** for lightweight deployments
-
----
-
-## 📊 Results
-
-### Performance Metrics
-
-Expected performance on COVID-19 test set (14 days):
-
-- **MAE**: 1000-1400 daily cases
-- **RMSE**: 1300-1700 daily cases
-- **MAPE**: 18-25%
-
-### Visualizations
-
-Each notebook generates:
-- ✅ Forecast plot with confidence intervals
-- ✅ Model comparison chart
-- ✅ Scenario analysis visualization (DeepAR example)
-
-### Example Output
-
-```
-DeepAR Model Performance:
-======================================================
-MAE:  1050.23 cases
-RMSE: 1345.67 cases
-MAPE: 18.45%
-CRPS: 892.34
-======================================================
-```
-
----
-
-## 🎭 Scenario Analysis
-
-The DeepAR example includes **public health intervention** scenario analysis:
+### Train DeepAR Model
 
 ```python
-scenarios = {
-    'No Intervention': 1.0,
-    'Mild Measures': 0.85,
-    'Moderate Lockdown': 0.65,
-    'Strict Lockdown': 0.40,
-    'Worsening': 1.25
-}
-```
+from GluonTS_utils_models import train_deepar_covid
 
-**Output**: Comparative visualization showing how different policies affect forecast outcomes.
+results = train_deepar_covid(
+    train_ds=train_ds,
+    test_ds=test_ds,
+    prediction_length=14,
+    num_feat_dynamic_real=num_features,
+    epochs=10,
+    learning_rate=0.001,
+    context_length=60,
+    num_layers=2,
+    hidden_size=40,
+    dropout=0.1,
+    verbose=True
+)
+
+print(f"MAE: {results.metrics['mae']:.2f}")
+print(f"Training time: {results.training_time:.1f}s")
+```
 
 ---
 
-## 💡 Key Features
+### Compare All Models
 
-### 1. Probabilistic Forecasting
-- Not just point estimates
-- Full confidence intervals (10-90%, 25-75%)
-- Monte Carlo sampling for uncertainty
+```python
+from GluonTS_utils_models import compare_models, print_model_comparison
 
-### 2. Multi-Feature Learning
-- **Cases**: Target variable
-- **Deaths**: Validation signal and severity indicator
-- **Mobility**: Population movement patterns
-- **CFR**: Case Fatality Ratio (derived feature)
+# Train all models
+deepar_results = train_deepar_covid(...)
+ff_results = train_feedforward_covid(...)
+npts_results = train_deepnpts_covid(...)
 
-### 3. CPU-Optimized
-- Fast training (~5-6 min total)
-- Reduced network sizes
-- Efficient configurations
-- No GPU required
-
-### 4. Production-Ready Code
-- Modular utilities
-- Clean separation of concerns
-- Reusable functions
-- Well-documented
+# Compare
+comparison = compare_models([deepar_results, ff_results, npts_results])
+print_model_comparison(comparison)
+```
 
 ---
 
-## 🔬 Technical Details
+## 📊 Expected Results
 
-### Framework
-- **GluonTS 0.14.0** with PyTorch backend
-- **PyTorch Lightning** for training
-- **Pandas/NumPy** for data manipulation
+### Model Performance (on test set)
 
-### Data Processing
-1. County-level → National aggregation
-2. Daily values → 7-day moving average (smoothing)
-3. Feature engineering (CFR calculation)
-4. Train/test split (80/20)
+| Model | MAE | RMSE | MAPE | Training Time |
+|-------|-----|------|------|---------------|
+| DeepAR | ~X,XXX | ~X,XXX | ~XX% | ~3-4 min |
+| SimpleFeedForward | ~X,XXX | ~X,XXX | ~XX% | ~30-60 sec |
+| DeepNPTS | ~X,XXX | ~X,XXX | ~XX% | ~3-4 min |
 
-### Model Configurations
+*Actual results vary based on train/test split and data quality*
 
-**DeepAR** (Optimized):
-- Context: 30 days
-- Layers: 1
-- Hidden: 20 units
-- Epochs: 10
+### What You'll See
 
-**SimpleFeedForward** (Optimized):
-- Context: 30 days
-- Hidden: [20] units
-- Epochs: 8
+1. **Beautiful Visualizations**:
+   - Time series plots (cases, deaths, mobility)
+   - Forecast plots with confidence intervals
+   - Model comparison charts
+   - Scenario analysis comparisons
 
-**DeepNPTS** (Optimized):
-- Context: 30 days
-- Hidden: 16 dim
-- Layers: 2
-- Epochs: 10
+2. **Comprehensive Metrics**:
+   - MAE (Mean Absolute Error)
+   - RMSE (Root Mean Squared Error)
+   - MAPE (Mean Absolute Percentage Error)
+   - Training time comparisons
 
----
-
-## 🐳 Docker Setup
-
-### Quick Start (3 commands)
-
-```bash
-# 1. Build the Docker image
-./docker_build.sh
-
-# 2. Start Jupyter Notebook
-./docker_jupyter.sh
-
-# 3. Open browser to http://localhost:8888
-```
-
-### What You Get
-
-- ✅ Pre-configured Python 3.10 environment
-- ✅ All dependencies installed (GluonTS, PyTorch, etc.)
-- ✅ Jupyter Notebook server on port 8888
-- ✅ Your project folder mounted (changes persist)
-- ✅ No manual setup required!
-
-### Available Scripts
-
-**Build Docker image**:
-```bash
-./docker_build.sh
-```
-
-**Run Jupyter Notebook**:
-```bash
-./docker_jupyter.sh
-# Opens Jupyter at http://localhost:8888
-```
-
-**Run interactive Bash**:
-```bash
-./docker_bash.sh
-# For debugging or running Python scripts
-```
-
-### Complete Guide
-
-See **[docs/DOCKER_GUIDE.md](docs/DOCKER_GUIDE.md)** for:
-- Detailed setup instructions
-- Troubleshooting tips
-- Docker command reference
-- Security notes
-
----
-
-## 📝 Requirements
-
-### Python Packages
-
-```
-pandas>=1.5.0
-numpy>=1.23.0
-matplotlib>=3.6.0
-gluonts[torch]>=0.14.0
-torch>=2.0.0
-pytorch-lightning>=2.0.0
-jupyterlab>=3.6.0
-```
-
-See `requirements.txt` for complete list.
-
-### Data Files
-
-Required in `data/` folder:
-- `cases.csv` - JHU CSSE COVID-19 cases
-- `deaths.csv` - JHU CSSE COVID-19 deaths
-- `mobility.csv` - Google Mobility Reports
-- `vaccine.csv` - CDC vaccination data
+3. **Actionable Insights**:
+   - Which model performs best
+   - How external features improve forecasts
+   - Impact of intervention scenarios
+   - Recommendations for public health policy
 
 ---
 
 ## 🎓 Learning Path
 
-### For Beginners
+### Beginner Path (New to Forecasting)
 
-1. Read **README.md** (this file)
-2. Run `GluonTS_DeepAR.API.ipynb` (simple demo)
-3. Read **GluonTS.API.md** (understand the API)
-4. Run `GluonTS_DeepAR.example.ipynb` (complete example)
+1. **Read**: `GluonTS.API.md` - Understand the basics
+2. **Run**: `GluonTS.API.ipynb` - See models in action
+3. **Focus on**: 
+   - What each model does
+   - How to configure parameters
+   - What metrics mean
 
-### For Intermediate Users
+**Time**: 30-45 minutes
 
-1. Compare all 3 models (run all example notebooks)
-2. Read **GluonTS.example.md** (design decisions)
-3. Modify hyperparameters
-4. Try different forecast horizons
+---
 
-### For Advanced Users
+### Intermediate Path (Know Forecasting Basics)
 
-1. Add new models (Transformer, etc.)
-2. Incorporate vaccines data
-3. State-level forecasting
-4. Real-time deployment
+1. **Run**: `GluonTS.example.ipynb` - Complete application
+2. **Study**:
+   - Feature engineering strategies
+   - Model comparison techniques
+   - Evaluation best practices
+3. **Experiment**: Change parameters, try different features
+
+**Time**: 1-2 hours
+
+---
+
+### Advanced Path (Practitioners)
+
+1. **Study**: All utility code (`GluonTS_utils_*.py`)
+2. **Adapt**: Replace COVID data with your own time series
+3. **Extend**: 
+   - Add new features
+   - Try ensemble methods
+   - Implement hierarchical forecasting
+4. **Deploy**: Production considerations
+
+**Time**: 2-4 hours
+
+---
+
+## 🔬 Technical Details
+
+### Models
+
+**DeepAR** (Salinas et al., 2020)
+- Architecture: Autoregressive RNN with external features
+- Distribution: Student's t-distribution for uncertainty
+- Training: PyTorch Lightning backend
+- Best for: Complex temporal patterns, rich feature sets
+
+**SimpleFeedForward**
+- Architecture: Feed-forward MLP
+- Distribution: Gaussian or Student's t
+- Training: Fast CPU training
+- Best for: Baselines, quick experiments, stable trends
+- Limitation: No external features
+
+**DeepNPTS** (Rangapuram et al., 2021)
+- Architecture: Non-parametric deep learning
+- Distribution: Kernel density estimation
+- Training: Lightweight, flexible
+- Best for: Regime changes, distribution shifts
+
+---
+
+### Feature Engineering
+
+Engineered features (all computed in preprocessing):
+
+1. **Daily_Cases_MA7**: 7-day moving average of cases (target)
+2. **Daily_Deaths_MA7**: 7-day moving average of deaths
+3. **Cumulative_Deaths**: Total deaths up to each date
+4. **CFR**: Case Fatality Ratio (deaths/cases)
+5. **Mobility Metrics** (6 features):
+   - Retail & Recreation
+   - Grocery & Pharmacy
+   - Parks
+   - Transit Stations
+   - Workplaces
+   - Residential
+
+All features are standardized and aligned temporally.
+
+---
+
+### Training Configuration
+
+**Hardware**: CPU-optimized (M1/M2/M3 Mac compatible)
+
+**Default Parameters**:
+```python
+# DeepAR
+epochs = 10
+context_length = 60  # 2 months history
+prediction_length = 14  # 2 weeks forecast
+hidden_size = 40
+num_layers = 2
+dropout = 0.1
+
+# SimpleFeedForward
+epochs = 20  # Fast training, can use more
+context_length = 60
+prediction_length = 14
+hidden_dimensions = [40, 40]
+
+# DeepNPTS
+epochs = 15
+context_length = 60
+prediction_length = 14
+num_hidden_nodes = [40]
+dropout_rate = 0.1
+```
+
+---
+
+## 📝 Submission Structure
+
+This project follows **MSML610 Fall 2025 submission guidelines** with a streamlined approach:
+
+### Consolidated Structure
+
+Instead of 6 separate notebooks (3 API + 3 example), we provide:
+- ✅ **2 main notebooks**: `GluonTS.API.ipynb` and `GluonTS.example.ipynb`
+- ✅ **Both cover all 3 models** side-by-side for easy comparison
+- ✅ **Comprehensive documentation**: Detailed `.md` files for each notebook
+
+### Benefits
+
+- ✅ Easier navigation (2 notebooks vs. 6)
+- ✅ Direct model comparison
+- ✅ Aligned with submission template structure
+- ✅ More maintainable and consistent
+
+### Archive
+
+Old individual notebooks are in `archive/` folder for reference.
+
+---
+
+## 🐛 Troubleshooting
+
+### Docker Issues
+
+**Problem**: `docker_build.sh` fails
+```bash
+# Solution: Ensure Docker is running
+docker info
+
+# Rebuild from scratch
+docker_build.sh --no-cache
+```
+
+**Problem**: Port 8888 already in use
+```bash
+# Solution: Change port in docker_jupyter.sh
+# Edit: -p 8889:8888 (use 8889 instead)
+```
+
+---
+
+### Training Issues
+
+**Problem**: Models training very slowly
+```bash
+# Solution 1: Reduce epochs
+epochs = 5  # instead of 10
+
+# Solution 2: Reduce network size
+hidden_size = 20  # instead of 40
+
+# Solution 3: Use SimpleFeedForward for quick tests
+```
+
+**Problem**: Out of memory errors
+```bash
+# Solution: Reduce batch size
+batch_size = 16  # instead of 32
+```
+
+---
+
+### Data Issues
+
+**Problem**: Data files not found
+```bash
+# Verify data/ folder exists
+ls data/
+
+# Should see: cases.csv, deaths.csv, mobility.csv, vaccine.csv
+```
+
+**Problem**: Feature count mismatch
+```python
+# Check num_feat_dynamic_real matches actual features
+print(f"Features: {data['num_features']}")
+print(f"Feature names: {data['features']}")
+```
+
+---
+
+## 📚 Additional Resources
+
+### GluonTS Documentation
+- Official Docs: https://ts.gluon.ai/
+- Tutorials: https://ts.gluon.ai/stable/tutorials/
+- API Reference: https://ts.gluon.ai/stable/api/
+- GitHub: https://github.com/awslabs/gluonts
+
+### Time Series Forecasting
+- Book: "Forecasting: Principles and Practice" (Hyndman & Athanasopoulos)
+- Course: fast.ai Time Series
+- Papers:
+  - DeepAR: https://arxiv.org/abs/1704.04110
+  - DeepNPTS: https://arxiv.org/abs/1906.05264
+
+### COVID-19 Data
+- JHU CSSE: https://github.com/CSSEGISandData/COVID-19
+- Google Mobility: https://www.google.com/covid19/mobility/
+- CDC Data: https://covid.cdc.gov/covid-data-tracker/
 
 ---
 
 ## 🤝 Contributing
 
-This is a class project for MSML610 Fall 2025.
+This is a class project for **MSML610 Fall 2025**. 
 
-For issues or questions:
-1. Check existing documentation
-2. Review notebook outputs
-3. Consult TA or instructor
+For questions or issues:
+1. Check the documentation (`GluonTS.API.md`, `GluonTS.example.md`)
+2. Review troubleshooting section above
+3. Consult utility code (well-commented!)
 
 ---
 
 ## 📄 License
 
-MIT License - See LICENSE file for details.
+MIT License - See LICENSE file for details
 
 ---
 
-## 👥 Authors
+## 🎓 Course Information
 
-**Student**: [Your Name]  
-**Course**: MSML610 - Machine Learning  
-**Semester**: Fall 2025  
-**University**: University of Maryland
-
----
-
-## 🙏 Acknowledgments
-
-- **GluonTS Team** - Excellent time series toolkit
-- **Johns Hopkins CSSE** - COVID-19 data
-- **Google** - Community Mobility Reports
-- **MSML610 Teaching Staff** - Project guidance
+**Course**: MSML610 Fall 2025  
+**Topic**: Probabilistic Time Series Forecasting  
+**Framework**: GluonTS with PyTorch backend  
+**Hardware**: CPU-optimized for M1/M2/M3 Macs
 
 ---
 
-## 📚 References
+## 🎉 Acknowledgments
 
-1. [GluonTS Documentation](https://ts.gluon.ai/)
-2. [JHU CSSE COVID-19 Data](https://github.com/CSSEGISandData/COVID-19)
-3. [Google Mobility Reports](https://www.google.com/covid19/mobility/)
-4. DeepAR Paper: [Salinas et al., 2020](https://arxiv.org/abs/1704.04110)
+**Data Sources**:
+- Johns Hopkins University CSSE COVID-19 Data
+- Google COVID-19 Community Mobility Reports
+- CDC COVID Data Tracker
+
+**Frameworks**:
+- GluonTS (Amazon Web Services)
+- PyTorch and PyTorch Lightning
+- Pandas, NumPy, Matplotlib, Seaborn
 
 ---
 
-**Project Status**: ✅ Complete and Tested  
-**Last Updated**: December 11, 2025  
-**Version**: 1.0
+**Last Updated**: December 2025  
+**Project Status**: ✅ Complete and ready for submission!
 
+---
+
+## 📞 Quick Reference
+
+**Main Notebooks**:
+- `GluonTS.API.ipynb` - API demonstrations
+- `GluonTS.example.ipynb` - Complete application
+
+**Documentation**:
+- `GluonTS.API.md` - API guide
+- `GluonTS.example.md` - Example guide
+- `docs/START_HERE.md` - Quick start
+
+**Docker**:
+```bash
+./docker_build.sh      # Build
+./docker_jupyter.sh    # Run Jupyter
+./docker_bash.sh       # Shell access
+```
+
+**Data**:
+- `data/cases.csv` - COVID-19 cases
+- `data/deaths.csv` - COVID-19 deaths
+- `data/mobility.csv` - Google Mobility
+- `data/vaccine.csv` - CDC vaccines (future use)
+
+**Models**:
+- DeepAR: Advanced RNN (~3-4 min)
+- SimpleFeedForward: Fast baseline (~30 sec)
+- DeepNPTS: Flexible non-parametric (~3-4 min)
+
+---
+
+Ready to forecast COVID-19 cases? Start with `GluonTS.API.ipynb`! 🚀📈

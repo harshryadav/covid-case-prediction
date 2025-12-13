@@ -1,440 +1,470 @@
 # GluonTS API Documentation
 
-## Overview
-
-GluonTS is a Python toolkit for probabilistic time series forecasting built on PyTorch and MXNet. This document describes:
-1. **GluonTS Native API** - The core PyTorch estimators and predictors
-2. **Our Wrapper Layer** - Simplified functions built on top of GluonTS
+**A friendly guide to using GluonTS for time series forecasting**
 
 ---
 
-## 🎯 GluonTS Native API
+## Overview
 
-### Architecture
+This document explains how to use the three GluonTS models demonstrated in `GluonTS.API.ipynb`. Think of this as your reference guide while the notebook is your hands-on tutorial.
 
-GluonTS follows this pattern:
+### What is GluonTS?
+
+GluonTS is a Python library for probabilistic time series forecasting. Unlike traditional models that give you a single prediction, GluonTS models give you a **distribution of possible futures** - which means you get predictions with confidence intervals!
+
+### Why Probabilistic Forecasting?
+
+Imagine you're planning hospital resources during COVID-19. Instead of hearing "we'll have 50,000 cases tomorrow," wouldn't it be more useful to hear "we expect 50,000 cases, but there's a 90% chance it will be between 40,000 and 60,000"? That's what probabilistic forecasting gives you - uncertainty quantification that helps with planning.
+
+---
+
+## The Three Models
+
+### 1. DeepAR - The Pattern Learner
+
+**What it is:** DeepAR uses recurrent neural networks (RNNs) to learn temporal patterns. Think of it as a model with memory - it remembers what happened in the past to make smarter predictions about the future.
+
+**When to use it:**
+- ✅ You have complex, repeating patterns (like COVID waves)
+- ✅ Your data has seasonality (weekly reporting cycles, holiday effects)
+- ✅ You need to capture long-term dependencies
+- ✅ Accuracy matters more than training speed
+
+**How it works:** DeepAR learns patterns by looking at historical sequences. For COVID data, it learns that:
+- Cases tend to follow a weekly pattern (lower on weekends)
+- Waves have characteristic rise and fall shapes
+- External factors (mobility, deaths) help predict case trends
+
+**Key strengths:**
+- Excellent at capturing complex temporal dynamics
+- Handles seasonality naturally
+- Produces well-calibrated uncertainty estimates
+
+**Limitations:**
+- Slower to train (1-5 minutes typically)
+- More hyperparameters to tune
+- Requires more data to learn effectively
+
+---
+
+### 2. SimpleFeedForward - The Speed Demon
+
+**What it is:** A straightforward neural network that maps recent history directly to future predictions. No fancy memory, no recurrent connections - just simple, fast, effective.
+
+**When to use it:**
+- ✅ You need fast experiments (prototyping, parameter search)
+- ✅ Your data has stable, smooth trends
+- ✅ You want a baseline to beat
+- ✅ You need quick retraining in production
+
+**How it works:** SimpleFeedForward looks at the recent past (say, last 60 days) and directly predicts the next 14 days. It's like drawing a trend line, but with a neural network that can learn non-linear patterns.
+
+**Key strengths:**
+- Trains 10x faster than DeepAR
+- Fewer hyperparameters = easier to tune
+- Great baseline for comparison
+- Works well for stable trends
+
+**Limitations:**
+- Doesn't capture complex temporal dependencies
+- Less effective for highly seasonal data
+- Can struggle with sudden regime changes
+
+---
+
+### 3. DeepNPTS - The Flexible Learner
+
+**What it is:** DeepNPTS (Deep Non-Parametric Time Series) is special - it doesn't assume your data follows any particular distribution (like normal or Poisson). Instead, it learns the distribution directly from your data.
+
+**When to use it:**
+- ✅ Your data distribution keeps changing (like different COVID waves)
+- ✅ You have unusual, non-standard distributions
+- ✅ You see regime changes (patterns shift over time)
+- ✅ Your data has heavy tails or rare extreme events
+
+**How it works:** Most models say "I assume your data is normally distributed" or "I assume it follows a Poisson distribution." DeepNPTS says "Show me your data, and I'll figure out the distribution myself." This makes it incredibly flexible for COVID data where each wave behaves differently.
+
+**Key strengths:**
+- Adapts to changing data distributions
+- No distribution assumptions needed
+- Handles regime changes gracefully
+- Good for unusual, non-standard data
+
+**Limitations:**
+- More complex than SimpleFeedForward
+- Requires careful hyperparameter tuning
+- Can be slower to train
+
+---
+
+## Model Parameters Explained
+
+### Common Parameters (All Models)
+
+#### `freq` (string)
+**What it does:** Specifies your data's frequency.  
+**Typical values:** `'D'` (daily), `'H'` (hourly), `'M'` (monthly)  
+**Example:** `freq='D'` for daily COVID cases
+
+#### `prediction_length` (int)
+**What it does:** How many time steps ahead to forecast.  
+**Typical values:** 7 (one week), 14 (two weeks), 30 (one month)  
+**COVID example:** `prediction_length=14` to forecast 2 weeks of cases
+
+#### `context_length` (int)
+**What it does:** How much historical data to use for predictions.  
+**Rule of thumb:** 2-4× prediction_length  
+**Example:** `context_length=60` uses 2 months of history to predict 2 weeks
+
+#### `num_feat_dynamic_real` (int)
+**What it does:** Number of external features (covariates) you're providing.  
+**COVID example:** If you have deaths + 3 mobility features = `num_feat_dynamic_real=4`  
+**Important:** Must match the number of feature columns in your data!
+
+#### `epochs` (int)
+**What it does:** How many times to go through the training data.  
+**Trade-off:** More epochs = better fit but longer training  
+**Typical values:** 
+- DeepAR: 20-50 epochs
+- SimpleFeedForward: 50-100 epochs (it's fast!)
+- DeepNPTS: 20-40 epochs
+
+#### `lr` (float, learning rate)
+**What it does:** How fast the model learns from data.  
+**Typical values:** 0.001 (default, good starting point), 0.0001 (careful learning)  
+**Rule:** Too high = unstable training, too low = very slow learning
+
+---
+
+### DeepAR-Specific Parameters
+
+#### `num_layers` (int)
+**What it does:** How many RNN layers to stack.  
+**Impact:** More layers = can learn more complex patterns  
+**Typical values:** 2-3 layers  
+**COVID example:** `num_layers=2` captures weekly cycles + wave patterns
+
+#### `hidden_size` (int)
+**What it does:** Size of the hidden state in the RNN (network capacity).  
+**Impact:** Bigger = more complex patterns, but slower training  
+**Typical values:** 40-100  
+**Rule of thumb:** Start with 40, increase if underfitting
+
+#### `dropout_rate` (float)
+**What it does:** Randomly drops connections during training to prevent overfitting.  
+**Typical values:** 0.1-0.2 (10-20% dropout)  
+**When to increase:** If your model memorizes training data
+
+---
+
+### SimpleFeedForward-Specific Parameters
+
+#### `hidden_dims` (list of ints)
+**What it does:** Sizes of hidden layers in the network.  
+**Example:** `hidden_dims=[40, 40]` means two layers, 40 units each  
+**Impact:** More layers or bigger layers = more capacity  
+**COVID example:** `[40, 40]` is usually sufficient
+
+---
+
+### DeepNPTS-Specific Parameters
+
+#### `hidden_size` (int)
+**What it does:** Network capacity for learning the data distribution.  
+**Typical values:** 40-100  
+**Impact:** Controls how flexible the learned distribution can be
+
+---
+
+## Choosing the Right Model
+
+Here's a decision tree to help you choose:
 
 ```
-Data → Estimator → Predictor → Forecast
+Start here!
+│
+├─ Do you need FAST training (< 1 min)?
+│  │
+│  ├─ YES → Use SimpleFeedForward
+│  │        Great for: baselines, experiments, stable trends
+│  │
+│  └─ NO → Continue...
+│
+├─ Does your data have COMPLEX patterns?
+│  (multiple cycles, strong seasonality, long-term dependencies)
+│  │
+│  ├─ YES → Use DeepAR
+│  │        Great for: COVID waves, retail sales, web traffic
+│  │
+│  └─ NO → Continue...
+│
+└─ Does your data distribution CHANGE over time?
+   (regime shifts, different behavior in different periods)
+   │
+   ├─ YES → Use DeepNPTS
+   │        Great for: COVID (each wave is different), finance
+   │
+   └─ NO → Use SimpleFeedForward or DeepAR
+           Test both and compare!
 ```
 
-1. **Dataset**: `ListDataset` - Time series data structure
-2. **Estimator**: Defines and trains the model
-3. **Predictor**: Makes predictions from trained model
-4. **Forecast**: Contains predictions with quantiles
+---
 
-### Core Components
+## Quick Start: Model Configuration
 
-#### 1. ListDataset (Data Structure)
+### DeepAR - Good Defaults for COVID
 
-```python
-from gluonts.dataset.common import ListDataset
-
-dataset = ListDataset(
-    [
-        {
-            "start": "2020-01-01",  # Start date
-            "target": [1.0, 2.0, 3.0, ...],  # Time series values
-            "feat_static_cat": [0],  # Optional: static features
-        }
-    ],
-    freq="D"  # Frequency: 'D' (daily), 'H' (hourly), etc.
-)
-```
-
-#### 2. Estimators (Model Training)
-
-**DeepAR Estimator**:
 ```python
 from gluonts.torch.model.deepar import DeepAREstimator
 
 estimator = DeepAREstimator(
-    freq="D",
-    prediction_length=14,
-    context_length=60,
-    num_layers=2,
-    hidden_size=40,
-    dropout_rate=0.1,
-    lr=0.001,
+    freq='D',                    # Daily data
+    prediction_length=14,        # Forecast 2 weeks
+    context_length=60,           # Use 2 months of history
+    num_feat_dynamic_real=3,     # Example: 3 features (deaths + 2 mobility)
+    
+    # Network architecture
+    num_layers=2,                # Good balance
+    hidden_size=40,              # Sufficient for COVID patterns
+    dropout_rate=0.1,            # Prevent overfitting
+    
+    # Training
+    lr=0.001,                    # Standard learning rate
+    epochs=20,                   # Good for demos (use 30-50 in production)
     batch_size=32,
+    num_batches_per_epoch=50,
     trainer_kwargs={"max_epochs": 20}
 )
-
-predictor = estimator.train(train_dataset)
 ```
 
-**SimpleFeedForward Estimator**:
+### SimpleFeedForward - Fast Baseline
+
 ```python
 from gluonts.torch.model.simple_feedforward import SimpleFeedForwardEstimator
 
 estimator = SimpleFeedForwardEstimator(
-    freq="D",
+    freq='D',
     prediction_length=14,
-    context_length=30,
-    hidden_dims=[40],
+    context_length=60,
+    num_feat_dynamic_real=3,
+    
+    # Network architecture
+    hidden_dims=[40, 40],        # Two hidden layers
+    
+    # Training (can use more epochs since it's fast!)
     lr=0.001,
+    epochs=50,                   # Still trains in under a minute
     batch_size=32,
-    trainer_kwargs={"max_epochs": 10}
+    num_batches_per_epoch=50,
+    trainer_kwargs={"max_epochs": 50}
 )
-
-predictor = estimator.train(train_dataset)
 ```
 
-**DeepNPTS Estimator**:
+### DeepNPTS - Flexible Distribution Learning
+
 ```python
 from gluonts.torch.model.deep_npts import DeepNPTSEstimator
 
 estimator = DeepNPTSEstimator(
-    freq="D",
-    prediction_length=14,
-    context_length=30,
-    hidden_dim=16,
-    num_layers=2,
-    lr=0.001,
-    batch_size=32,
-    trainer_kwargs={"max_epochs": 10}
-)
-
-predictor = estimator.train(train_dataset)
-```
-
-#### 3. Predictor (Inference)
-
-```python
-# Generate forecasts
-forecast_it = predictor.predict(test_dataset)
-forecasts = list(forecast_it)
-
-# Access forecast properties
-forecast = forecasts[0]
-forecast.mean          # Point forecast
-forecast.quantile(0.1) # 10th percentile
-forecast.quantile(0.9) # 90th percentile
-forecast.start_date    # Forecast start
-```
-
----
-
-## 🔧 Our Wrapper Layer
-
-We provide simplified wrapper functions in `utils/gluonts_utils.py` that handle common tasks.
-
-### Data Preparation
-
-#### create_gluonts_dataset()
-
-Convert pandas DataFrame to GluonTS format.
-
-```python
-from utils.gluonts_utils import create_gluonts_dataset
-
-train_ds = create_gluonts_dataset(
-    df=train_df,
-    target_column='Daily_Cases_MA7',
     freq='D',
-    prediction_length=14
-)
-```
-
-**Parameters**:
-- `df`: pandas DataFrame with Date column
-- `target_column`: Column name to forecast
-- `freq`: Time frequency ('D', 'H', 'W', etc.)
-- `prediction_length`: Forecast horizon
-
-**Returns**: `ListDataset` ready for training
-
----
-
-### Model Training
-
-#### train_deepar()
-
-Train DeepAR model with optimized defaults.
-
-```python
-from utils.gluonts_utils import train_deepar
-
-predictor = train_deepar(
-    train_data=train_ds,
     prediction_length=14,
-    context_length=30,
-    num_layers=1,
-    num_cells=20,
-    epochs=10
+    context_length=60,
+    num_feat_dynamic_real=3,
+    
+    # Network architecture
+    hidden_size=40,
+    
+    # Training
+    lr=0.001,
+    epochs=30,                   # Moderate training time
+    batch_size=32,
+    num_batches_per_epoch=50,
+    trainer_kwargs={"max_epochs": 30}
 )
 ```
 
-**Key Parameters**:
-- `train_data`: GluonTS ListDataset
-- `prediction_length`: How many steps to forecast
-- `context_length`: How many historical steps to use
-- `num_layers`: Number of RNN layers
-- `num_cells`: Hidden layer size
-- `epochs`: Training iterations
-
-**Returns**: Trained `Predictor` object
-
 ---
 
-#### train_feedforward()
+## Generating Forecasts
 
-Train SimpleFeedForward baseline model.
-
-```python
-from utils.gluonts_utils import train_feedforward
-
-predictor = train_feedforward(
-    train_data=train_ds,
-    prediction_length=14,
-    context_length=30,
-    hidden_dims=[20],
-    epochs=8
-)
-```
-
-**Key Parameters**:
-- `hidden_dims`: List of hidden layer sizes
-- Other params same as `train_deepar()`
-
-**Returns**: Trained `Predictor` object
-
----
-
-#### train_deepnpts()
-
-Train DeepNPTS lightweight model.
+All three models follow the same prediction pattern:
 
 ```python
-from utils.gluonts_utils import train_deepnpts
+from gluonts.evaluation import make_evaluation_predictions
 
-predictor = train_deepnpts(
-    train_data=train_ds,
-    prediction_length=14,
-    context_length=30,
-    hidden_dim=16,
-    num_layers=2,
-    epochs=10
-)
-```
+# Train the model
+predictor = estimator.train(train_dataset)
 
-**Key Parameters**:
-- `hidden_dim`: Hidden layer dimensionality
-- `num_layers`: Number of layers
-
-**Returns**: Trained `Predictor` object
-
----
-
-### Forecasting
-
-#### generate_forecast()
-
-Generate predictions from trained model.
-
-```python
-from utils.gluonts_utils import generate_forecast
-
-forecasts, truths = generate_forecast(
+# Generate probabilistic forecasts
+forecast_it, ts_it = make_evaluation_predictions(
+    dataset=test_dataset,
     predictor=predictor,
-    test_data=test_ds,
-    num_samples=100
+    num_samples=100  # Generate 100 sample paths for uncertainty
 )
+
+# Convert to lists
+forecasts = list(forecast_it)
+ground_truths = list(ts_it)
+
+# Get your forecast
+forecast = forecasts[0]  # For single time series
+
+# Access predictions
+mean_forecast = forecast.mean              # Mean prediction
+median_forecast = forecast.quantile(0.5)   # Median (50th percentile)
+lower_bound = forecast.quantile(0.1)       # Lower confidence (10th percentile)
+upper_bound = forecast.quantile(0.9)       # Upper confidence (90th percentile)
 ```
-
-**Parameters**:
-- `predictor`: Trained model
-- `test_data`: Test dataset
-- `num_samples`: Monte Carlo samples for uncertainty
-
-**Returns**:
-- `forecasts`: List of Forecast objects
-- `truths`: List of ground truth time series
 
 ---
 
-### Evaluation
+## Understanding Probabilistic Forecasts
 
-#### evaluate_forecast()
+### What You Get
 
-Compute forecast accuracy metrics.
+When you generate a forecast, you don't just get one number - you get a whole distribution!
 
 ```python
-from utils.gluonts_utils import evaluate_forecast
-
-metrics = evaluate_forecast(
-    forecast=forecasts[0],
-    ground_truth=truths[0]
-)
-
-print(f"MAE: {metrics['mae']:.2f}")
-print(f"RMSE: {metrics['rmse']:.2f}")
-print(f"MAPE: {metrics['mape']:.2f}%")
+forecast.mean           # Average of all predictions
+forecast.median         # Middle value (50th percentile)
+forecast.quantile(0.1)  # 10% of predictions are below this
+forecast.quantile(0.9)  # 90% of predictions are below this
 ```
 
-**Returns**: Dictionary with keys:
-- `mae`: Mean Absolute Error
-- `rmse`: Root Mean Squared Error
-- `mape`: Mean Absolute Percentage Error
-- `crps`: Continuous Ranked Probability Score
+### Confidence Intervals
 
----
-
-### Visualization
-
-#### plot_forecast()
-
-Plot forecast with confidence intervals.
+You can create confidence intervals at any level:
 
 ```python
-from utils.gluonts_utils import plot_forecast
+# 80% confidence: 80% of the time, true value is in this range
+lower_80 = forecast.quantile(0.1)
+upper_80 = forecast.quantile(0.9)
 
-plot_forecast(
-    forecast=forecasts[0],
-    ground_truth=truths[0],
-    title="COVID-19 Cases Forecast",
-    save_path="forecast.png"
-)
+# 90% confidence: 90% of the time, true value is in this range
+lower_90 = forecast.quantile(0.05)
+upper_90 = forecast.quantile(0.95)
+
+# 95% confidence: even wider
+lower_95 = forecast.quantile(0.025)
+upper_95 = forecast.quantile(0.975)
 ```
 
-**Parameters**:
-- `forecast`: Forecast object
-- `ground_truth`: Actual values
-- `title`: Plot title
-- `save_path`: Where to save figure
+### Why This Matters
 
-**Creates**: Time series plot with 10-90% confidence bands
-
----
-
-#### compare_models()
-
-Compare multiple models side-by-side.
-
-```python
-from utils.gluonts_utils import compare_models
-
-compare_models(
-    model_metrics={
-        'DeepAR': {'mae': 1050, 'rmse': 1345, 'mape': 18.4},
-        'SimpleFeedForward': {'mae': 1234, 'rmse': 1523, 'mape': 21.2},
-        'DeepNPTS': {'mae': 1123, 'rmse': 1434, 'mape': 19.7}
-    },
-    save_path="comparison.png"
-)
-```
-
-**Creates**: Bar chart comparing model performance
+For COVID-19 planning:
+- **Mean forecast:** "We expect 50,000 cases"
+- **80% interval:** "We're 80% confident it'll be between 40,000-60,000"
+- **Planning:** "Better prepare resources for up to 60,000 to be safe"
 
 ---
 
-### Scenario Analysis
+## Common Issues and Solutions
 
-#### scenario_analysis()
+### Issue 1: "My model is overfitting!"
 
-Simulate public health interventions.
+**Symptoms:** Great training performance, poor test performance
 
-```python
-from utils.gluonts_utils import scenario_analysis
+**Solutions:**
+- Increase `dropout_rate` (try 0.2 or 0.3 for DeepAR)
+- Reduce `hidden_size` or `hidden_dims`
+- Use less `context_length`
+- Get more training data if possible
 
-scenarios = {
-    'No Intervention': 1.0,
-    'Mild Measures': 0.85,
-    'Moderate Lockdown': 0.65,
-    'Strict Lockdown': 0.40
-}
+### Issue 2: "Training is too slow!"
 
-results = scenario_analysis(
-    predictor=predictor,
-    base_forecast=forecasts[0],
-    scenarios=scenarios,
-    prediction_length=14
-)
-```
+**Solutions:**
+- Use SimpleFeedForward instead of DeepAR
+- Reduce `epochs` (start with 10-20)
+- Reduce `hidden_size`
+- Reduce `num_batches_per_epoch`
 
-**Parameters**:
-- `predictor`: Trained model
-- `base_forecast`: Baseline forecast
-- `scenarios`: Dict of intervention multipliers
-- `prediction_length`: Forecast horizon
+### Issue 3: "Predictions are way off!"
 
-**Returns**: Dict of adjusted forecasts per scenario
+**Debugging checklist:**
+1. Check `num_feat_dynamic_real` matches your actual features
+2. Verify your data has no NaN values
+3. Try increasing `context_length` (use more history)
+4. Try more `epochs`
+5. Check if your features are properly normalized
 
----
+### Issue 4: "Model gives weird uncertainty estimates"
 
-## 📊 Complete Workflow Example
-
-```python
-# 1. Load data
-from utils.load_data_utils import load_all_data
-data = load_all_data("data")
-
-# 2. Preprocess
-from utils.preprocess_data_utils import preprocess_pipeline
-merged, train_df, test_df = preprocess_pipeline(
-    data['cases'], data['deaths'], data['mobility']
-)
-
-# 3. Create GluonTS datasets
-from utils.gluonts_utils import create_gluonts_dataset
-train_ds = create_gluonts_dataset(train_df, 'Daily_Cases_MA7', 'D', 14)
-test_ds = create_gluonts_dataset(test_df, 'Daily_Cases_MA7', 'D', 14)
-
-# 4. Train model
-from utils.gluonts_utils import train_deepar
-predictor = train_deepar(train_ds, prediction_length=14, epochs=10)
-
-# 5. Generate forecasts
-from utils.gluonts_utils import generate_forecast
-forecasts, truths = generate_forecast(predictor, test_ds)
-
-# 6. Evaluate
-from utils.gluonts_utils import evaluate_forecast
-metrics = evaluate_forecast(forecasts[0], truths[0])
-
-# 7. Visualize
-from utils.gluonts_utils import plot_forecast
-plot_forecast(forecasts[0], truths[0], save_path="forecast.png")
-```
+**Solutions:**
+- Increase `num_samples` in `make_evaluation_predictions` (try 200)
+- Train for more `epochs` - models need time to learn uncertainty
+- For DeepAR: tune `dropout_rate`
+- For DeepNPTS: this model specifically learns uncertainty well!
 
 ---
 
-## 🔑 Key Concepts
+## Performance Tips
 
-### Probabilistic Forecasting
-GluonTS generates **distributions** not just point forecasts:
-- Mean prediction
-- Confidence intervals (10-90%, 25-75%)
-- Full quantile function
+### For Best Accuracy
+1. Use DeepAR with:
+   - `context_length` = 4× prediction_length
+   - `epochs` = 30-50
+   - Include relevant external features
 
-### Context vs Prediction Length
-- **Context Length**: Historical data used as input
-- **Prediction Length**: How far ahead to forecast
-- Rule of thumb: context_length ≥ 2× prediction_length
+2. Tune hyperparameters:
+   - Try different `hidden_size` values (40, 60, 80, 100)
+   - Experiment with `num_layers` (2, 3, 4 for DeepAR)
 
-### Frequency Strings
-- `'D'`: Daily
-- `'H'`: Hourly
-- `'W'`: Weekly
-- `'M'`: Monthly
+### For Fastest Training
+1. Use SimpleFeedForward
+2. Reduce `num_batches_per_epoch` to 25-30
+3. Use `hidden_dims=[30, 30]` instead of `[40, 40]`
+
+### For Best Uncertainty Quantification
+1. Use DeepNPTS or DeepAR
+2. Generate forecasts with `num_samples=200` or more
+3. Train for more epochs
+4. Use dropout (DeepAR)
 
 ---
 
-## 📚 References
+## Evaluation Metrics
 
+### MAE (Mean Absolute Error)
+**What it is:** Average absolute difference between prediction and actual  
+**Interpretation:** Lower is better, measured in same units as your data  
+**COVID example:** MAE of 5,000 means predictions are off by 5,000 cases on average
+
+### RMSE (Root Mean Squared Error)
+**What it is:** Like MAE but penalizes large errors more  
+**Interpretation:** Lower is better, more sensitive to outliers than MAE  
+**When to use:** When large errors are especially bad
+
+### MAPE (Mean Absolute Percentage Error)
+**What it is:** Average error as a percentage of actual values  
+**Interpretation:** Lower is better, gives scale-independent comparison  
+**COVID example:** MAPE of 10% means predictions are off by 10% on average  
+**Good performance:** < 10% excellent, < 20% good, < 30% acceptable
+
+### CRPS (Continuous Ranked Probability Score)
+**What it is:** Measures quality of probabilistic forecasts  
+**Interpretation:** Lower is better, evaluates the entire distribution  
+**Why it matters:** MAE/RMSE only look at point forecasts, CRPS evaluates uncertainty too
+
+---
+
+## Next Steps
+
+### Learn by Doing
+- Run `GluonTS.API.ipynb` - hands-on tutorial with COVID data
+- Experiment with different parameters
+- Try all three models and compare results
+
+### See a Complete Application
+- Check out `GluonTS.example.ipynb` - full COVID-19 forecasting pipeline
+- Learn about model comparison, uncertainty quantification, scenario analysis
+
+### Further Reading
 - [GluonTS Documentation](https://ts.gluon.ai/)
-- [GluonTS GitHub](https://github.com/awslabs/gluonts)
-- [GluonTS Tutorial](https://ts.gluon.ai/stable/tutorials/index.html)
+- [DeepAR Paper](https://arxiv.org/abs/1704.04110)
+- [Time Series Forecasting Best Practices](https://github.com/microsoft/forecasting)
 
 ---
 
-**For complete examples**, see:
-- `GluonTS_DeepAR.example.ipynb`
-- `GluonTS_SimpleFeedForward.example.ipynb`
-- `GluonTS_DeepNPTS.example.ipynb`
+**Questions? Issues?** The best way to learn is by experimenting. Try different configurations, see what works for your data, and don't be afraid to make mistakes - that's how you learn!
 
-**For minimal API demos**, see:
-- `GluonTS_DeepAR.API.ipynb`
-- `GluonTS_SimpleFeedForward.API.ipynb`
-- `GluonTS_DeepNPTS.API.ipynb`
-
+**Happy forecasting! 🚀**

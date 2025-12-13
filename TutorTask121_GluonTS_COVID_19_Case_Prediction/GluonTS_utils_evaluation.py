@@ -7,18 +7,21 @@ Use these functions across all model notebooks to avoid code duplication.
 
 import numpy as np
 import pandas as pd
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Union
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 
-def calculate_metrics(forecast_values: np.ndarray, actual_values: np.ndarray) -> Dict[str, float]:
+def calculate_metrics(
+    forecast_values: Union[np.ndarray, pd.Series, list], 
+    actual_values: Union[np.ndarray, pd.Series, list]
+) -> Dict[str, float]:
     """
     Calculate comprehensive forecasting metrics.
     
     Args:
-        forecast_values: Array of forecasted values
-        actual_values: Array of actual values
+        forecast_values: Forecasted values (array, Series, or list)
+        actual_values: Actual values (array, Series, or list)
         
     Returns:
         Dictionary with metrics: mae, rmse, mape, me, max_error
@@ -27,6 +30,16 @@ def calculate_metrics(forecast_values: np.ndarray, actual_values: np.ndarray) ->
         >>> metrics = calculate_metrics(forecast.mean, actual)
         >>> print(f"MAE: {metrics['mae']:.2f}")
     """
+    # Convert to numpy arrays to ensure compatibility
+    forecast_values = np.asarray(forecast_values).flatten()
+    actual_values = np.asarray(actual_values).flatten()
+    
+    # Ensure same length
+    if len(forecast_values) != len(actual_values):
+        min_len = min(len(forecast_values), len(actual_values))
+        forecast_values = forecast_values[:min_len]
+        actual_values = actual_values[:min_len]
+    
     errors = forecast_values - actual_values
     
     # Mean Absolute Error

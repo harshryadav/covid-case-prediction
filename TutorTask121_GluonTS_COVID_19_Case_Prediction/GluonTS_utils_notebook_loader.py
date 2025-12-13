@@ -1,8 +1,9 @@
 """
-Quick Data Loader for Notebooks
+Data Loader for GluonTS Notebooks
 
 This module provides a simple one-function loader to get COVID-19 data
-ready for GluonTS models. Perfect for API notebooks that need real data quickly.
+ready for GluonTS models. This will load US COVID-19 cases, deaths, 
+and Google mobility data.
 """
 
 import pandas as pd
@@ -10,13 +11,13 @@ import numpy as np
 from typing import Tuple, Dict, List
 from pathlib import Path
 
-from utils.load_data_utils import DataLoader
-from utils.preprocess_data_utils import (
+from GluonTS_utils_data_io import DataLoader
+from GluonTS_utils_preprocessing import (
     aggregate_to_national,
     extract_national_mobility,
     merge_all_data
 )
-from utils.gluonts_utils import (
+from GluonTS_utils_gluonts import (
     create_gluonts_dataset,
     prepare_train_test_split
 )
@@ -31,15 +32,18 @@ def load_covid_data_for_gluonts(
     feature_subset: str = "minimal"
 ) -> Dict:
     """
-    One-stop function to load COVID-19 data and prepare for GluonTS.
+    One-stop function to load US COVID-19 data and prepare for GluonTS.
     
     This function handles everything:
-    1. Load raw COVID data (cases, deaths, mobility)
+    1. Load raw COVID data (cases, deaths, mobility from Google)
     2. Preprocess and aggregate to national level
     3. Merge all sources
     4. Split into train/test
     5. Convert to GluonTS format
     6. Return everything ready to use
+    
+    Note: Currently uses cases, deaths, and mobility data. Vaccine data
+    (data/vaccine.csv) is available for future enhancements.
     
     Args:
         data_dir: Directory containing CSV files
@@ -84,8 +88,8 @@ def load_covid_data_for_gluonts(
         cases_df = loader.load_cases()
         deaths_df = loader.load_deaths()
         mobility_df = loader.load_mobility()
-        # Note: vaccine data not currently used in merge
-        print("✓ Data files loaded successfully")
+        # Note: Vaccine data available in data/vaccine.csv for future enhancements
+        print("✓ Data files loaded successfully (cases, deaths, mobility)")
     except Exception as e:
         print(f"❌ Error loading data: {e}")
         print(f"   Make sure data files exist in '{data_dir}/' folder")
@@ -253,10 +257,10 @@ if __name__ == "__main__":
     print("=" * 70)
     print("\nUsage:")
     print("\n1. Full control:")
-    print("   from utils.data_loader_for_notebooks import load_covid_data_for_gluonts")
+    print("   from GluonTS_utils_notebook_loader import load_covid_data_for_gluonts")
     print("   data = load_covid_data_for_gluonts(feature_subset='minimal')")
     print("\n2. Quick shortcuts:")
-    print("   from utils.data_loader_for_notebooks import quick_load_minimal")
+    print("   from GluonTS_utils_notebook_loader import quick_load_minimal")
     print("   data = quick_load_minimal()")
     print("\n3. Access data:")
     print("   train_ds = data['train_ds']")
