@@ -25,10 +25,10 @@ Imagine you're planning hospital resources during COVID-19. Instead of hearing "
 **What it is:** DeepAR uses recurrent neural networks (RNNs) to learn temporal patterns. Think of it as a model with memory - it remembers what happened in the past to make smarter predictions about the future.
 
 **When to use it:**
-- ✅ You have complex, repeating patterns (like COVID waves)
-- ✅ Your data has seasonality (weekly reporting cycles, holiday effects)
-- ✅ You need to capture long-term dependencies
-- ✅ Accuracy matters more than training speed
+- You have complex, repeating patterns (like COVID waves)
+- Your data has seasonality (weekly reporting cycles, holiday effects)
+- You need to capture long-term dependencies
+- Accuracy matters more than training speed
 
 **How it works:** DeepAR learns patterns by looking at historical sequences. For COVID data, it learns that:
 - Cases tend to follow a weekly pattern (lower on weekends)
@@ -52,10 +52,10 @@ Imagine you're planning hospital resources during COVID-19. Instead of hearing "
 **What it is:** A straightforward neural network that maps recent history directly to future predictions. No fancy memory, no recurrent connections - just simple, fast, effective.
 
 **When to use it:**
-- ✅ You need fast experiments (prototyping, parameter search)
-- ✅ Your data has stable, smooth trends
-- ✅ You want a baseline to beat
-- ✅ You need quick retraining in production
+- You need fast experiments (prototyping, parameter search)
+- Your data has stable, smooth trends
+- You want a baseline to beat
+- You need quick retraining in production
 
 **How it works:** SimpleFeedForward looks at the recent past (say, last 60 days) and directly predicts the next 14 days. It's like drawing a trend line, but with a neural network that can learn non-linear patterns.
 
@@ -77,10 +77,10 @@ Imagine you're planning hospital resources during COVID-19. Instead of hearing "
 **What it is:** DeepNPTS (Deep Non-Parametric Time Series) is special - it doesn't assume your data follows any particular distribution (like normal or Poisson). Instead, it learns the distribution directly from your data.
 
 **When to use it:**
-- ✅ Your data distribution keeps changing (like different COVID waves)
-- ✅ You have unusual, non-standard distributions
-- ✅ You see regime changes (patterns shift over time)
-- ✅ Your data has heavy tails or rare extreme events
+- Your data distribution keeps changing (like different COVID waves)
+- You have unusual, non-standard distributions
+- You see regime changes (patterns shift over time)
+- Your data has heavy tails or rare extreme events
 
 **How it works:** Most models say "I assume your data is normally distributed" or "I assume it follows a Poisson distribution." DeepNPTS says "Show me your data, and I'll figure out the distribution myself." This makes it incredibly flexible for COVID data where each wave behaves differently.
 
@@ -465,6 +465,3 @@ For COVID-19 planning:
 
 ---
 
-**Questions? Issues?** The best way to learn is by experimenting. Try different configurations, see what works for your data, and don't be afraid to make mistakes - that's how you learn!
-
-**Happy forecasting! 🚀**

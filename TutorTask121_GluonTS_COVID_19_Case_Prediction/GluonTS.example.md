@@ -1,6 +1,6 @@
-# 🌍 GluonTS COVID-19 Forecasting: Complete Example
+# GluonTS COVID-19 Forecasting: Complete Example
 
-## 📖 Overview
+## Overview
 
 **GluonTS.example.ipynb** is your complete, production-ready reference implementation for COVID-19 forecasting. While the API notebook teaches you *how* to use GluonTS models, this example shows you *what* you can build with them!
 
@@ -8,18 +8,18 @@ This notebook demonstrates a full end-to-end forecasting application that public
 
 ---
 
-## 🎯 What Makes This Example Special?
+## What Makes This Example Special?
 
 ### Complete Application Flow
 
 This isn't just model training - it's a complete application:
 
-1. **📊 Data Pipeline**: Load, explore, and understand real COVID-19 data
-2. **🔧 Feature Engineering**: Create advanced features that improve predictions
-3. **🤖 Multi-Model Training**: Train and compare three different approaches
-4. **📈 Comprehensive Evaluation**: Use multiple metrics and visualizations
-5. **🎯 Scenario Analysis**: Simulate "what if" public health interventions
-6. **💡 Actionable Insights**: Generate recommendations for decision-makers
+1. ** Data Pipeline**: Load, explore, and understand real COVID-19 data
+2. ** Feature Engineering**: Create advanced features that improve predictions
+3. ** Multi-Model Training**: Train and compare three different approaches
+4. ** Comprehensive Evaluation**: Use multiple metrics and visualizations
+5. ** Scenario Analysis**: Simulate "what if" public health interventions
+6. ** Actionable Insights**: Generate recommendations for decision-makers
 
 ### Real-World Problem Solving
 
@@ -39,7 +39,7 @@ We tackle an actual public health challenge:
 
 ---
 
-## 🚀 Quick Start
+## Getting Started
 
 ### Prerequisites
 
@@ -71,7 +71,7 @@ Make sure you've completed the setup from the main README:
 
 ---
 
-## 📚 Notebook Structure
+## Notebook Structure
 
 The notebook is organized into 7 main sections:
 
@@ -260,7 +260,7 @@ The notebook is organized into 7 main sections:
 
 ---
 
-## 💡 Key Concepts Explained
+## Key Concepts Explained
 
 ### Probabilistic Forecasting
 
@@ -332,7 +332,7 @@ Example questions you can answer:
 
 ---
 
-## 🎓 Learning Path
+## Learning Trajectory
 
 ### If You're New to Forecasting
 
@@ -360,7 +360,7 @@ Dive deeper into the techniques:
 
 ---
 
-### If You're a Practitioner
+### If You've worked with it before
 
 Focus on production-readiness:
 
@@ -373,7 +373,7 @@ Focus on production-readiness:
 
 ---
 
-## 🔧 Customization Guide
+## Customization Guide
 
 ### Using Your Own Data
 
@@ -485,7 +485,7 @@ Then visualize all scenarios side-by-side!
 
 ---
 
-## 📊 Expected Outputs
+## Expected Outputs
 
 ### Visualizations
 
@@ -536,7 +536,7 @@ Actionable insights you'll discover:
 
 ---
 
-## ⚠️ Common Questions
+## Common Questions
 
 ### "Which model should I use?"
 
@@ -630,106 +630,3 @@ Actionable insights you'll discover:
 **Pro tip**: Sometimes poor forecasts reveal real changes in the underlying process (new variant, behavioral shift). Investigate why, don't just tune blindly!
 
 ---
-
-## 🚀 Next Steps After Completing This Example
-
-### Immediate Next Steps
-
-1. **Experiment with parameters**:
-   - Change training epochs, network sizes
-   - Try different train/test splits
-   - Add or remove features
-
-2. **Try your own data**:
-   - Replace COVID data with your time series
-   - Adapt feature engineering to your domain
-   - Compare model performance
-
-3. **Extend scenario analysis**:
-   - Create more intervention scenarios
-   - Simulate multiple "what if" questions
-   - Quantify uncertainty in scenarios
-
-### Advanced Projects
-
-1. **Hierarchical Forecasting**:
-   - Forecast at state level, aggregate to national
-   - Reconcile forecasts across hierarchy
-   - Use GluonTS hierarchical models
-
-2. **Real-Time System**:
-   - Automate data loading (APIs)
-   - Schedule daily retraining
-   - Create alerts for anomalies
-
-3. **Model Ensembles**:
-   - Combine all three models
-   - Weight by recent performance
-   - Improve robustness
-
-4. **Explainability**:
-   - Add feature importance analysis
-   - Visualize attention weights (DeepAR)
-   - SHAP values for interpretability
-
-### Learning Resources
-
-**GluonTS Documentation**:
-- Tutorials: https://ts.gluon.ai/stable/tutorials/
-- API Reference: https://ts.gluon.ai/stable/api/
-- Examples: https://github.com/awslabs/gluonts/tree/dev/examples
-
-**Time Series Forecasting**:
-- Book: "Forecasting: Principles and Practice" (Hyndman & Athanasopoulos)
-- Course: fast.ai Time Series course
-- Papers: DeepAR (arXiv:1704.04110), DeepNPTS
-
-**COVID-19 Forecasting**:
-- COVID-19 Forecast Hub: https://covid19forecasthub.org/
-- CDC Forecasting: https://www.cdc.gov/coronavirus/2019-ncov/science/forecasting/forecasting.html
-
----
-
-## 🎯 Summary
-
-**GluonTS.example.ipynb** is your complete guide to building production-ready forecasting applications!
-
-**You've learned**:
-- ✅ How to build end-to-end forecasting pipelines
-- ✅ Advanced feature engineering techniques
-- ✅ Training and comparing multiple models
-- ✅ Comprehensive evaluation strategies
-- ✅ Scenario analysis for decision support
-- ✅ Generating actionable insights
-
-**Ready to apply these skills?** Start with your own data and problem! The patterns and techniques here generalize to any time series forecasting challenge.
-
-**Questions?** Check the README, review the API documentation (GluonTS.API.ipynb), or dive into the utility code to see how everything works under the hood.
-
----
-
-## 📞 Getting Help
-
-**Notebook won't run?**
-- Check README.md for setup instructions
-- Verify Docker environment is working
-- Ensure all data files are in `data/` folder
-
-**Models training slowly?**
-- Reduce epochs for faster training
-- Decrease network sizes (hidden_size, hidden_dimensions)
-- Use SimpleFeedForward for quick experiments
-
-**Forecasts don't look right?**
-- Review the "What if my forecasts are way off?" section above
-- Check data quality and feature engineering
-- Verify correct parameters (freq, num_feat_dynamic_real)
-
-**Want to learn more?**
-- Study the API notebook (GluonTS.API.ipynb) for model details
-- Read the utility code - it's well-documented!
-- Check GluonTS official documentation
-
----
-
-Happy forecasting! 🎉📈
