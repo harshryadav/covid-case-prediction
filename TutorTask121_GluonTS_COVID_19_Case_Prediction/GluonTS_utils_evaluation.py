@@ -30,11 +30,11 @@ def calculate_metrics(
         >>> metrics = calculate_metrics(forecast.mean, actual)
         >>> print(f"MAE: {metrics['mae']:.2f}")
     """
-    # Convert to numpy arrays to ensure compatibility
+
     forecast_values = np.asarray(forecast_values).flatten()
     actual_values = np.asarray(actual_values).flatten()
     
-    # Ensure same length
+
     if len(forecast_values) != len(actual_values):
         min_len = min(len(forecast_values), len(actual_values))
         forecast_values = forecast_values[:min_len]
@@ -42,19 +42,15 @@ def calculate_metrics(
     
     errors = forecast_values - actual_values
     
-    # Mean Absolute Error
+
     mae = np.mean(np.abs(errors))
     
-    # Root Mean Squared Error
     rmse = np.sqrt(np.mean(errors**2))
     
-    # Mean Absolute Percentage Error
     mape = np.mean(np.abs(errors / actual_values)) * 100
     
-    # Mean Error (bias)
     me = np.mean(errors)
     
-    # Maximum Error
     max_error = np.max(np.abs(errors))
     
     return {
@@ -93,13 +89,13 @@ def print_metrics(metrics: Dict[str, float], model_name: str = "Model") -> None:
     elif metrics['mape'] < 20:
         print("\n✓ Good performance! Error < 20%")
     else:
-        print("\n⚠️  Moderate performance (COVID data is highly variable)")
+        print("\n  Moderate performance (COVID data is highly variable)")
     
     if abs(metrics['me']) < metrics['mae'] / 2:
         print("✓ Low bias (model not systematically over/under-predicting)")
     else:
         bias_direction = "over" if metrics['me'] > 0 else "under"
-        print(f"⚠️  Model tends to {bias_direction}-predict")
+        print(f"  Model tends to {bias_direction}-predict")
 
 
 def plot_forecast(
@@ -136,22 +132,20 @@ def plot_forecast(
     """
     plt.figure(figsize=(16, 6))
     
-    # Historical context
     train_context = train_df.tail(context_days)
     plt.plot(train_context['Date'], train_context[target_column],
              label='Historical Data', color='steelblue', linewidth=2, alpha=0.8)
     
-    # Actual future values
+
     plt.plot(forecast_dates, actual_values,
              label='Actual', color='orange', linewidth=3, 
              marker='o', markersize=8, zorder=5)
     
-    # Forecast
+
     plt.plot(forecast_dates, forecast_values,
              label=f'{model_name} Forecast', color='red', linewidth=3,
              marker='s', markersize=7, linestyle='--', zorder=4)
     
-    # Confidence intervals
     if 0.05 in forecast_quantiles and 0.95 in forecast_quantiles:
         plt.fill_between(
             forecast_dates,
@@ -212,7 +206,6 @@ def plot_error_analysis(
     forecast_period = len(forecast_values)
     errors = forecast_values - actual_values
     
-    # Plot 1: Forecast vs Actual
     axes[0, 0].plot(range(1, forecast_period + 1), actual_values, 'o-', 
                     label='Actual', color='orange', linewidth=2, markersize=8)
     axes[0, 0].plot(range(1, forecast_period + 1), forecast_values, 's--',
@@ -228,7 +221,6 @@ def plot_error_analysis(
     axes[0, 0].legend()
     axes[0, 0].grid(True, alpha=0.3)
     
-    # Plot 2: Forecast Errors
     colors = ['red' if e > 0 else 'green' for e in errors]
     axes[0, 1].bar(range(1, forecast_period + 1), errors, color=colors)
     axes[0, 1].axhline(y=0, color='black', linestyle='--', linewidth=1)
@@ -237,7 +229,6 @@ def plot_error_analysis(
     axes[0, 1].set_ylabel('Error (Forecast - Actual)')
     axes[0, 1].grid(True, alpha=0.3, axis='y')
     
-    # Plot 3: Absolute Percentage Errors
     ape = np.abs(errors / actual_values) * 100
     mape = np.mean(ape)
     axes[1, 0].bar(range(1, forecast_period + 1), ape, color='steelblue', alpha=0.7)
@@ -248,8 +239,7 @@ def plot_error_analysis(
     axes[1, 0].set_ylabel('Absolute % Error')
     axes[1, 0].legend()
     axes[1, 0].grid(True, alpha=0.3, axis='y')
-    
-    # Plot 4: Uncertainty Width
+
     if 0.1 in forecast_quantiles and 0.9 in forecast_quantiles:
         ci_width = forecast_quantiles[0.9] - forecast_quantiles[0.1]
         axes[1, 1].plot(range(1, forecast_period + 1), ci_width, 'o-', 
@@ -303,7 +293,6 @@ def compare_models(
         axes[idx].set_ylabel(metric.upper())
         axes[idx].grid(True, alpha=0.3, axis='y')
         
-        # Add value labels on bars
         for i, v in enumerate(values):
             axes[idx].text(i, v, f'{v:.1f}', ha='center', va='bottom')
     
@@ -315,8 +304,7 @@ def compare_models(
         print(f"✓ Comparison saved as '{save_path}'")
     
     plt.show()
-    
-    # Print table
+
     print("\n📊 Model Comparison Table:")
     print("=" * 70)
     print(f"{'Model':<20} {'MAE':>12} {'RMSE':>12} {'MAPE':>12}")
@@ -325,7 +313,6 @@ def compare_models(
         print(f"{model:<20} {metrics['mae']:>12,.2f} {metrics['rmse']:>12,.2f} {metrics['mape']:>11.2f}%")
     print("=" * 70)
     
-    # Find best model
     best_model = min(results.items(), key=lambda x: x[1]['mape'])
     print(f"\n🏆 Best Model (by MAPE): {best_model[0]} ({best_model[1]['mape']:.2f}%)")
 

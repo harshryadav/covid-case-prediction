@@ -191,26 +191,20 @@ class DataLoader:
     """
     
     def __init__(self, data_dir: str = "data"):
-        """Initialize data loader with data directory."""
         self.data_dir = data_dir
     
     def load_cases(self) -> pd.DataFrame:
-        """Load cases data."""
         return load_jhu_cases(self.data_dir)
     
     def load_deaths(self) -> pd.DataFrame:
-        """Load deaths data."""
         return load_jhu_deaths(self.data_dir)
     
     def load_vaccines(self) -> pd.DataFrame:
-        """Load vaccine data."""
         return load_jhu_vaccines(self.data_dir)
     
     def load_mobility(self) -> pd.DataFrame:
-        """Load mobility data."""
         return load_google_mobility(self.data_dir)
     
     def load_all(self) -> Dict[str, pd.DataFrame]:
-        """Load all datasets."""
         return load_all_data(self.data_dir)
 
