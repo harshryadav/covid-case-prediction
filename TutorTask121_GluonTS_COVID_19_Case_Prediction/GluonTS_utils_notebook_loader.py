@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 from typing import Tuple, Dict, List
 from pathlib import Path
+import sys
 
 from GluonTS_utils_data_io import DataLoader
 from GluonTS_utils_preprocessing import (
@@ -20,6 +21,46 @@ from GluonTS_utils_gluonts import (
     create_gluonts_dataset,
     prepare_train_test_split
 )
+
+
+def check_data_files(data_dir: str = "data") -> bool:
+    """
+    Check if required data files exist.
+    
+    Args:
+        data_dir: Directory where data files should be
+    
+    Returns:
+        bool: True if all files present, False otherwise
+    """
+    required_files = ['cases.csv', 'deaths.csv', 'mobility.csv']
+    data_path = Path(data_dir)
+    
+    missing = []
+    for filename in required_files:
+        if not (data_path / filename).exists():
+            missing.append(filename)
+    
+    if missing:
+        print("\n" + "="*70)
+        print("DATA FILES MISSING")
+        print("="*70)
+        print(f"\nThe following files are missing from '{data_dir}/' directory:")
+        for f in missing:
+            print(f"  - {f}")
+        
+        print("\nPlease download the data files:")
+        print("1. Visit: https://drive.google.com/drive/folders/1qMDGBstdY8H2hYpz8xSolhzNOsVxNHMA")
+        print("2. Download these files and rename them:")
+        print("   - time_series_covid19_confirmed_US.csv -> cases.csv")
+        print("   - time_series_covid19_deaths_US.csv -> deaths.csv")
+        print("   - mobility_report_US.csv -> mobility.csv")
+        print(f"3. Place them in the '{data_dir}/' directory")
+        print("\nAlternatively, run: python download_data.py")
+        print("="*70 + "\n")
+        return False
+    
+    return True
 
 
 def load_covid_data_for_gluonts(
@@ -34,12 +75,13 @@ def load_covid_data_for_gluonts(
     One-stop function to load US COVID-19 data and prepare for GluonTS.
     
     This function:
-    1. Loads raw COVID data (cases, deaths, mobility)
-    2. Preprocesses and aggregates to national level
-    3. Merges all sources
-    4. Splits into train/test
-    5. Converts to GluonTS format
-    6. Returns everything ready to use
+    1. Checks if data files exist (provides download instructions if missing)
+    2. Loads raw COVID data (cases, deaths, mobility)
+    3. Preprocesses and aggregates to national level
+    4. Merges all sources
+    5. Splits into train/test
+    6. Converts to GluonTS format
+    7. Returns everything ready to use
     
     Args:
         data_dir: Directory containing CSV files
@@ -55,6 +97,13 @@ def load_covid_data_for_gluonts(
     Returns:
         Dictionary with train_ds, test_ds, DataFrames, and metadata
     """
+    # Check if data files exist first
+    if not check_data_files(data_dir):
+        raise FileNotFoundError(
+            f"Required data files missing from '{data_dir}/' directory. "
+            "Please download them as instructed above."
+        )
+    
     print("=" * 70)
     print("COVID-19 DATA LOADER")
     print("=" * 70)

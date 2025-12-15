@@ -35,6 +35,14 @@ Thumbs.db
 *.bak
 *.log
 
+# Data files (download separately from Google Drive)
+data/*.csv
+data/*.tsv
+data/*.xlsx
+
+# Keep data directory structure
+!data/.gitkeep
+
 # Development files (optional)
 PHASE*.md
 *_PLAN*.md
