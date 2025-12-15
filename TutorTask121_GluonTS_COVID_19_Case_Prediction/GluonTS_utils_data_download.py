@@ -68,13 +68,13 @@ def check_and_download_data(data_dir='data'):
     data_path = Path(data_dir)
     data_path.mkdir(exist_ok=True)
     
-    # Google Drive file IDs for each dataset
+    # Persnal Google Drive where JHU U.S. COVID-19 and mobility data is stored 
+    # Note these are the IDs for each dataset
     # From: https://drive.google.com/drive/folders/1qMDGBstdY8H2hYpz8xSolhzNOsVxNHMA
     drive_files = {
         'cases.csv': '1ZfZtoV3PpZblZYES0A5LHCwp54cR8RJL',
         'deaths.csv': '1kYC9nrCnKbNpnoZKz8o6TDMM371gyxbl',
         'mobility.csv': '1TMqG8Z8vbxmQAv1rNKczYYPCzwT4ZS_q',
-        'vaccine.csv': None  # Not provided, will use manual download instructions
     }
     
     # Check which files exist
@@ -126,13 +126,13 @@ def check_and_download_data(data_dir='data'):
             'cases.csv': 'time_series_covid19_confirmed_US.csv',
             'deaths.csv': 'time_series_covid19_deaths_US.csv',
             'mobility.csv': 'mobility_report_US.csv',
-            'vaccine.csv': 'time_series_covid19_vaccine_us.csv'
         }
         
         print("\nDownload these files and save to 'data/' directory:")
         for local_name in failed:
-            drive_name = file_mapping[local_name]
-            print(f"  - {drive_name} → rename to '{local_name}'")
+            if local_name in file_mapping:
+                drive_name = file_mapping[local_name]
+                print(f"  - {drive_name} → rename to '{local_name}'")
         
         return False
     
