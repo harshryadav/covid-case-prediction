@@ -5,7 +5,7 @@
 
 ---
 
-## HARSH - Steps 1-4 (1-2 minutes)
+## HARSH - Steps 1-4 (2-3 minutes)
 
 ### Step 1: Introduction (30 seconds)
 
@@ -98,16 +98,13 @@ First, we build the image:"
 - Jupyter server started successfully
 - Access token for security
 - Volume mounted to /workspace
+- MPS fallback enabled for Apple Silicon compatibility
 
 We can now access Jupyter at localhost:8888."
 
-**[If Docker issues occurred, Harsh would explain]:**
-
-"We encountered [describe issue, e.g., MPS operator not implemented] which we resolved by adding `PYTORCH_ENABLE_MPS_FALLBACK=1` to enable CPU fallback for unsupported MPS operations on Apple Silicon."
-
 ---
 
-### Step 4: Open Jupyter Notebook (30 seconds)
+### Step 4: Open Jupyter Notebooks (30 seconds)
 
 **[Harsh opens browser to localhost:8888]:**
 
@@ -115,244 +112,843 @@ We can now access Jupyter at localhost:8888."
 
 "Here's our Jupyter environment. You can see all our project files.
 
-Let me open the **GluonTS.example.ipynb** notebook - this contains our complete COVID-19 forecasting application.
+We have two main notebooks:
+1. **GluonTS.API.ipynb** - Demonstrates the GluonTS API with each model
+2. **GluonTS.example.ipynb** - Complete COVID-19 forecasting application
 
-The notebook is organized into clear sections:
-1. Introduction and Setup
-2. Data Loading and Exploration
-3. Model Training - DeepAR, SimpleFeedForward, DeepNPTS
-4. Model Evaluation
-5. Model Comparison
-6. Scenario Analysis
+We'll start with the API notebook to show you how each model works, then move to the example notebook for the complete application.
 
-Now I'll hand it over to all of us for the project walkthrough."
+Let me open **GluonTS.API.ipynb** first."
+
+**[Opens GluonTS.API.ipynb]:**
+
+"This notebook is organized by model - each team member will walk through their assigned model:
+- Part 1: DeepAR - I'll demonstrate
+- Part 2: SimpleFeedForward - Utkrisht will demonstrate
+- Part 3: DeepNPTS - Deepika will demonstrate
+
+Let's begin!"
 
 ---
 
 ## ALL 3 MEMBERS - Step 5: Full Project Walkthrough (12-15 minutes)
 
-**[Recommendation: Split this section among all 3 presenters. Here's a suggested split:]**
+### PART A: API Notebook - Model Demonstrations
 
-### HARSH - Introduction, Setup, and Data Loading (3-4 minutes)
+---
 
-**[Harsh runs Cell 1 - Title/Introduction]:**
+### HARSH - DeepAR (GluonTS.API.ipynb Cells 0-18) - 4-5 minutes
+
+**[Harsh scrolls to top of API notebook]:**
+
+#### Cell 0: Notebook Introduction
 
 **[Harsh speaks]:**
 
-"This notebook demonstrates a complete COVID-19 forecasting system. The problem we're solving is: hospitals need to predict case surges 14 days ahead to allocate resources like ICU beds, ventilators, and staff."
+"This is our API tutorial notebook. It teaches how to use GluonTS for time series forecasting.
 
-**[Harsh runs Cell 2 - Imports]:**
+We're using COVID-19 data because it has:
+- Multiple waves showing complex patterns
+- Weekly seasonality from reporting cycles
+- External factors like mobility changes
+- Real-world importance for resource planning
 
-"First, we import our libraries. Notice we're importing GluonTS models - DeepAR, SimpleFeedForward, and DeepNPTS - along with our custom utility functions."
-
-**[Harsh runs Cell 3 - Load Data]:**
-
-"Now we load our COVID-19 data using our `quick_load_minimal()` function. This does several things automatically:
-- Checks if data files exist
-- Downloads from Google Drive if missing
-- Loads cases, deaths, and mobility data
-- Aggregates to national level
-- Applies 7-day moving average to smooth reporting artifacts
-- Merges all data sources
-- Splits into training and testing sets
-- Converts to GluonTS format
-
-Let me run this cell..."
-
-**[Cell runs, shows output]:**
-
-**[Harsh explains output]:**
-
-"Look at the output:
-- Training period: ~1,123 days from January 2020 to February 2023
-- Testing period: 14 days in early March 2023
-- Target variable: Daily_Cases_MA7 (7-day moving average of cases)
-- Features: 3 features - Deaths data, Cumulative Deaths, and Case Fatality Rate
-- These features help the model predict case trends because deaths lag cases and indicate healthcare strain."
-
-**[Harsh runs Cell 4 - Data Exploration/Visualization]:**
-
-"Here we visualize the COVID-19 timeline. You can see:
-- Multiple distinct waves - Original, Delta, Omicron
-- Clear weekly seasonality - cases drop on weekends due to reporting delays
-- The features we're using: deaths trend and mobility patterns
-
-This visualization confirms we have complex temporal patterns, which is why we need sophisticated models like GluonTS."
+Let me run through the setup cells quickly."
 
 ---
 
-### UTKRISHT - Model Training (4-5 minutes)
+#### Cells 1-5: Setup and Data Loading
+
+**[Harsh runs Cell 3 - Imports]:**
+
+"Cell 3 imports all necessary libraries:
+- Standard libraries: pandas, numpy, matplotlib
+- GluonTS models: DeepAR, SimpleFeedForward, DeepNPTS
+- Our custom utilities for data loading and evaluation"
+
+**[Output shows: "All imports successful"]:**
+
+"Good, all imports successful."
+
+**[Harsh runs Cell 5 - Load Data]:**
+
+**[Harsh speaks while cell runs]:**
+
+"Cell 5 loads our COVID-19 data using `quick_load_minimal()`. This function:
+- Checks if data files exist in the data folder
+- Downloads them automatically from Google Drive if missing
+- Loads cases, deaths, and mobility data
+- Preprocesses and aggregates to national level
+- Applies 7-day moving averages
+- Splits into training and testing sets
+- Converts to GluonTS format"
+
+**[Output shows data loading process]:**
+
+"You can see the output:
+- Training period: 1,123 days (January 2020 to February 2023)
+- Testing period: 14 days (late February to early March 2023)
+- Target variable: Daily_Cases_MA7 - the 7-day moving average of cases
+- Features: 3 features - Daily_Deaths_MA7, Cumulative_Deaths, and CFR (Case Fatality Rate)
+
+These features help predict case trends because deaths lag cases and indicate healthcare strain."
+
+---
+
+#### Cell 7: Visualize the Data
+
+**[Harsh runs Cell 7]:**
+
+**[Graph appears showing COVID-19 timeline]:**
+
+**[Harsh speaks]:**
+
+"This visualization shows the complete US COVID-19 timeline:
+- The blue line is our training data - 3+ years of history
+- The orange line is our test data - the future we're trying to predict
+- The red vertical line marks 'today' - where our forecast begins
+
+Notice the multiple distinct waves:
+- The original 2020 surge
+- The Delta variant peak in late 2021
+- The massive Omicron wave in early 2022
+- Subsequent smaller waves
+
+You can also see weekly patterns - the jagged nature of the line shows lower reporting on weekends.
+
+This complex pattern is exactly why we need sophisticated models like DeepAR."
+
+---
+
+#### Cells 8-10: DeepAR Configuration
+
+**[Harsh scrolls to Part 1: DeepAR section]:**
+
+**[Harsh speaks]:**
+
+"Now let me demonstrate **DeepAR** - our first model.
+
+DeepAR uses recurrent neural networks, which means it has 'memory' - it remembers what happened before to make better predictions.
+
+Use DeepAR when you have:
+- Complex patterns like COVID waves
+- Seasonality like weekly cycles
+- Long-term dependencies
+- Multiple related time series"
+
+**[Harsh runs Cell 10 - Configure DeepAR]:**
+
+**[Harsh explains while pointing to code]:**
+
+"Let me explain the key configuration parameters:
+
+**Temporal parameters:**
+- `freq='D'`: Daily data
+- `prediction_length=14`: We're forecasting 14 days ahead (2 weeks)
+- `context_length=60`: We use 60 days (2 months) of history to make predictions
+  - Rule of thumb: context should be 2-4x the prediction length
+
+**Feature configuration:**
+- `num_feat_dynamic_real=3`: We're using 3 external features - deaths and CFR metrics
+  - These help the model understand case trends better
+
+**Network architecture:**
+- `num_layers=2`: Two RNN layers to learn patterns
+- `hidden_size=40`: 40 neurons per layer - enough capacity for COVID patterns
+- `dropout_rate=0.1`: Light regularization to prevent overfitting
+
+**Training settings:**
+- `lr=0.001`: Learning rate
+- `trainer_kwargs={'max_epochs': 10}`: Train for 10 epochs
+  - This is fast for demos; production would use 20-30 epochs"
+
+**[Output shows configuration summary]:**
+
+"The output confirms: forecasting 14 days ahead using 60 days of history with 3 features."
+
+---
+
+#### Cells 11-12: Train DeepAR
+
+**[Harsh runs Cell 12 - Train DeepAR]:**
+
+**[Harsh speaks while training shows progress]:**
+
+"Now we're training DeepAR on our COVID-19 data. 
+
+Notice the output:
+- PyTorch Lightning is managing the training under the hood
+- You can see 'Epoch 0, Epoch 1, Epoch 2...' as it trains
+- The 'train_loss' value is decreasing - this means the model is learning!
+- Started at 11.71, now down to 11.13 - that's good progress
+
+Training takes about 2-3 minutes on CPU. Each epoch processes 50 batches of data."
+
+**[Training completes]:**
+
+"Training complete! DeepAR has learned the COVID-19 patterns from 3+ years of data."
+
+---
+
+#### Cells 13-14: Generate Forecasts
+
+**[Harsh runs Cell 14 - Generate Forecasts]:**
+
+**[Harsh speaks]:**
+
+"Now we generate forecasts. 
+
+This is where GluonTS shines - it produces **probabilistic forecasts**, not just a single prediction.
+
+We're generating 100 sample forecasts to quantify uncertainty. This gives us:
+- Mean prediction: The average expected outcome
+- Confidence intervals: The range of likely outcomes"
+
+**[Output shows forecast summary]:**
+
+"Look at the output:
+- Mean prediction: ~49,000 cases per day
+- Forecast range: 44,800 to 53,000 cases
+- 90% confidence interval: 15,000 to 81,000 cases
+
+This tells us: 'We expect around 49,000 cases, but there's significant uncertainty due to COVID's unpredictable nature.'"
+
+---
+
+#### Cell 16: Visualize DeepAR Predictions
+
+**[Harsh runs Cell 16]:**
+
+**[Graph appears showing forecast with confidence bands]:**
+
+**[Harsh speaks while pointing to graph]:**
+
+"This is a powerful visualization. Let me explain what you're seeing:
+
+**Historical context (left side):**
+- Blue line: Last 90 days of training data for context
+- Shows the declining trend leading up to our forecast point
+
+**The forecast (right side after red line):**
+- Orange dots: Actual future values (what really happened)
+- Green dashed line: DeepAR's mean prediction
+- Light green shaded areas: Confidence intervals
+  - Darker green: 80% confidence
+  - Lighter green: 90% confidence
+
+**What this tells us:**
+- DeepAR captured the declining trend reasonably well
+- The actual values (orange) mostly fall within our confidence intervals
+- The uncertainty bands are wide, reflecting COVID's inherent unpredictability
+- The model provides a realistic range of outcomes, not false precision"
+
+---
+
+#### Cell 18: Evaluate DeepAR Performance
+
+**[Harsh runs Cell 18]:**
+
+**[Harsh speaks]:**
+
+"Now let's evaluate DeepAR's performance using standard metrics:
+
+**The output shows:**
+- MAE (Mean Absolute Error): 13,905 cases
+  - On average, we're off by about 14,000 cases per day
+  
+- RMSE (Root Mean Square Error): 14,183 cases
+  - Similar to MAE but penalizes large errors more
+  
+- MAPE (Mean Absolute Percentage Error): 40.2%
+  - On average, we're off by about 40%
+  
+**Is this good?** 
+The notebook says 'Decent baseline' - and that's fair. A 40% error might seem high, but remember:
+- COVID-19 is extremely volatile
+- We're forecasting 14 days ahead
+- External events (new variants, policy changes) can shift patterns suddenly
+- The confidence intervals captured most actual values
+
+For real-world deployment, we'd tune hyperparameters more carefully - increase epochs to 30, adjust hidden size, optimize context length. But this demonstrates the model works!
+
+**Key takeaway:** DeepAR learned COVID patterns, captured trends, and quantified uncertainty appropriately."
+
+---
+
+**[Harsh transitions]:**
+
+"That's DeepAR! Now let me hand it over to Utkrisht, who will demonstrate SimpleFeedForward - our fast baseline model."
+
+---
+
+### UTKRISHT - SimpleFeedForward (GluonTS.API.ipynb Cells 19-34) - 3-4 minutes
 
 **[Utkrisht takes over screen sharing]:**
 
-**[Utkrisht speaks]:**
+**[Utkrisht scrolls to Part 2: SimpleFeedForward section]:**
 
-"Now I'll demonstrate training our three models. Each model has different strengths."
-
-**[Utkrisht runs DeepAR training cell]:**
+#### Cells 19-21: SimpleFeedForward Introduction and Configuration
 
 **[Utkrisht speaks]:**
 
-"First, **DeepAR** - an autoregressive RNN model. 
+"Thanks Harsh! Now I'll demonstrate **SimpleFeedForward** - the fast baseline model.
 
-Configuration:
-- Context length: 60 days (looks back 2 months)
-- Prediction length: 14 days (forecasts 2 weeks ahead)
-- Features: 3 (deaths, CFR, cumulative deaths)
-- Architecture: 2 RNN layers with 40 hidden units
-- Training: 10 epochs
+SimpleFeedForward is different from DeepAR:
+- No recurrent connections, no memory
+- Direct mapping from recent history to future
+- Trains about 10x faster than DeepAR
+- Simpler architecture with fewer parameters
 
-DeepAR is best for COVID-19 because:
-- It captures complex wave patterns
-- It learns weekly seasonality
-- It handles long-term dependencies between waves
+Use SimpleFeedForward when you need:
+- Fast training for quick experiments
+- Testing different scenarios rapidly
+- A simple baseline for comparison
+- Your data has stable, predictable trends"
 
-Let me run this... Training takes about 2-3 minutes."
+**[Utkrisht runs Cell 21 - Configure SimpleFeedForward]:**
 
-**[While training shows progress]:**
+**[Utkrisht explains]:**
 
-"You can see PyTorch Lightning is training under the hood. The loss is decreasing, which means the model is learning the patterns."
+"Let me explain the configuration:
 
-**[Training completes]:**
+**Key differences from DeepAR:**
+- `prediction_length=14` and `context_length=60` - same as DeepAR
+- `hidden_dimensions=[40, 40]` - two feedforward layers with 40 neurons each
+  - This is simpler than DeepAR's RNN layers
+  
+**Important notes:**
+- SimpleFeedForward does NOT use `freq` parameter
+- SimpleFeedForward does NOT use external features (`num_feat_dynamic_real`)
+- It only looks at the target variable (cases) history
+- We're training for 20 epochs since it's so fast
 
-"DeepAR training complete! Now let's generate forecasts and see the results."
+This simplicity is both a strength (speed) and limitation (less information)."
 
-**[Utkrisht runs DeepAR forecast cell]:**
+**[Output confirms configuration]:**
 
-"Here's the DeepAR forecast. Notice:
-- The blue line is the mean prediction
-- The shaded area shows uncertainty (10th to 90th percentile)
-- The red dots are actual values
-- The model captures the trend quite well
-
-The uncertainty bounds are crucial - they tell us the range of possible outcomes, which helps hospitals prepare for best and worst case scenarios."
-
-**[Utkrisht runs SimpleFeedForward training cell]:**
-
-**[Utkrisht speaks]:**
-
-"Next, **SimpleFeedForward** - a fast baseline model.
-
-Configuration:
-- Context length: 60 days (same as DeepAR)
-- Prediction length: 14 days
-- No external features (target only)
-- Architecture: 2 feedforward layers
-- Training: 10 epochs
-
-This model is much faster - trains in about 30 seconds. It's good for:
-- Quick experiments
-- Baseline comparisons
-- Stable, predictable trends
-
-Let me run this..."
-
-**[Training completes quickly]:**
-
-"See how fast that was? Now the forecast..."
-
-**[Utkrisht runs SimpleFeedForward forecast cell]:**
-
-"SimpleFeedForward produces smoother forecasts. It doesn't capture the weekly seasonality as well as DeepAR, but it's much faster to train. This is the speed-accuracy tradeoff."
-
-**[Utkrisht runs DeepNPTS training cell]:**
-
-**[Utkrisht speaks]:**
-
-"Finally, **DeepNPTS** - the non-parametric model.
-
-Configuration:
-- Context length: 60 days
-- Features: 3 (same as DeepAR)
-- Architecture: 2 layers with 40 nodes each
-- Training: 10 epochs
-
-DeepNPTS is special because it doesn't assume a specific distribution. This is important for COVID-19 because:
-- Each wave behaves differently
-- Delta wave ≠ Omicron wave
-- Distribution changes over time
-
-Training takes about 1-2 minutes..."
-
-**[Training completes]:**
-
-"Great! Now the forecast..."
-
-**[Utkrisht runs DeepNPTS forecast cell]:**
-
-"DeepNPTS provides flexible uncertainty estimates. It adapts to changing distributions, which is valuable during transitions between variants or waves."
+"Configuration set. Notice the output mentions it doesn't use frequency or external features like DeepAR."
 
 ---
 
-### DEEPIKA - Model Evaluation and Comparison (3-4 minutes)
+#### Cells 22-23: Train SimpleFeedForward
+
+**[Utkrisht runs Cell 23 - Train SimpleFeedForward]:**
+
+**[Utkrisht speaks while training runs]:**
+
+"Watch how fast this trains compared to DeepAR!
+
+Notice:
+- Same PyTorch Lightning backend
+- Same epoch structure
+- But much faster - completing in about 30 seconds vs 2-3 minutes for DeepAR
+
+The train_loss is decreasing: starting around 12.89, going down to 12.77.
+
+This speed advantage is huge for:
+- Hyperparameter tuning (try many configurations quickly)
+- Production retraining (daily updates with new data)
+- Rapid prototyping
+
+And... done! See how fast that was?"
+
+**[Training completes]:**
+
+"SimpleFeedForward trained! About 10x faster than DeepAR."
+
+---
+
+#### Cells 24-25: Generate SimpleFeedForward Forecasts
+
+**[Utkrisht runs Cell 25 - Generate Forecasts]:**
+
+**[Utkrisht speaks]:**
+
+"Now generating forecasts the same way - 100 samples for uncertainty quantification.
+
+**Output shows:**
+- Mean prediction: ~48,000 cases per day
+- Forecast range: 44,000 to 51,000 cases
+- 90% confidence interval: wider than DeepAR (more uncertainty)
+
+Interesting comparison to DeepAR:
+- Similar mean predictions (~48k vs ~49k)
+- Slightly narrower forecast range
+- But larger confidence intervals - less certain"
+
+---
+
+#### Cell 27: Visualize SimpleFeedForward Predictions
+
+**[Utkrisht runs Cell 27]:**
+
+**[Graph appears]:**
+
+**[Utkrisht speaks while pointing to visualization]:**
+
+"Here's SimpleFeedForward's forecast visualization:
+
+**Comparing to DeepAR's graph:**
+- Purple dashed line: SimpleFeedForward's mean prediction
+- Purple shaded areas: Confidence intervals
+- Orange dots: Still the actual values
+
+**Key observations:**
+1. **Smoother predictions:** Notice SimpleFeedForward's forecast is smoother than DeepAR
+   - It doesn't capture the weekly seasonality (the jagged pattern)
+   - It extrapolates a smooth trend
+   
+2. **Similar trend direction:** It got the general declining direction right
+
+3. **Wider uncertainty at the end:** The confidence bands widen more as we go further out
+   - This is realistic - uncertainty increases with time
+
+4. **Some actual values outside confidence bands:** A few orange dots escape the purple shaded area
+   - This suggests the model might be slightly underestimating uncertainty
+
+**Why the differences?**
+- No RNN memory → can't learn weekly patterns as well
+- No external features → missing death/mobility signals
+- Simpler architecture → less capacity for complex patterns
+
+**But remember:** This trained 10x faster! That's the speed-accuracy tradeoff."
+
+---
+
+#### Cell 29: Evaluate SimpleFeedForward Performance
+
+**[Utkrisht runs Cell 29]:**
+
+**[Utkrisht speaks]:**
+
+"Let's see the performance metrics:
+
+**Output shows:**
+- MAE: 14,055 cases (slightly worse than DeepAR's 13,905)
+- RMSE: 14,261 cases (slightly worse than DeepAR's 14,183)
+- MAPE: 40.2% (same as DeepAR!)
+
+**Interesting findings:**
+1. SimpleFeedForward is only marginally worse than DeepAR
+   - About 150 cases more error on average
+   - In percentage terms, same MAPE
+   
+2. For this particular test period, the simple model was nearly as good
+
+3. But it trained 10x faster!
+
+**The output says 'Decent baseline'** - and that's exactly what this is. In practice:
+- Use SimpleFeedForward for quick experiments and baselines
+- Use DeepAR when you need maximum accuracy
+- The 10x speed advantage often matters more than 1% accuracy gain"
+
+---
+
+#### Cell 30: SimpleFeedForward Wrap-up
+
+**[Utkrisht reads the key takeaways]:**
+
+"The notebook summarizes SimpleFeedForward's value:
+
+**When to use it:**
+- Quick prototyping and experimentation
+- Establishing baselines for comparison
+- Production scenarios where retraining speed matters
+- Data with stable, smooth trends
+
+**Trade-offs:**
+- ✓ 10x faster training
+- ✓ Fewer hyperparameters to tune
+- ✓ Good enough accuracy for many use cases
+- ✗ Doesn't capture complex seasonality
+- ✗ Can't use external features
+- ✗ Less sophisticated pattern recognition
+
+For COVID-19 forecasting in production, I'd recommend:
+- Use SimpleFeedForward for daily quick forecasts
+- Use DeepAR for weekly detailed analysis
+- Compare both to catch discrepancies"
+
+---
+
+**[Utkrisht transitions]:**
+
+"That's SimpleFeedForward! Now Deepika will demonstrate DeepNPTS - our most flexible model that adapts to changing distributions."
+
+---
+
+### DEEPIKA - DeepNPTS (GluonTS.API.ipynb Cells 35-50) - 3-4 minutes
 
 **[Deepika takes over screen sharing]:**
 
-**[Deepika speaks]:**
+**[Deepika scrolls to Part 3: DeepNPTS section]:**
 
-"Now I'll show you how we evaluate and compare these models."
-
-**[Deepika runs evaluation cells for each model]:**
-
-"For each model, we calculate four metrics:
-
-1. **MAE (Mean Absolute Error)**: Average prediction error in number of cases. Lower is better. Easy to interpret - if MAE is 2,500, we're off by 2,500 cases on average.
-
-2. **RMSE (Root Mean Square Error)**: Penalizes large errors more than MAE. Also in number of cases. Lower is better.
-
-3. **MAPE (Mean Absolute Percentage Error)**: Scale-independent metric shown as percentage. Tells us the average percent error. Lower is better.
-
-4. **CRPS (Continuous Ranked Probability Score)**: Evaluates the full probabilistic forecast, not just point predictions. Rewards well-calibrated uncertainty. Lower is better.
-
-Let me run the evaluation cells..."
-
-**[Cells run, showing metrics for all models]:**
-
-"Looking at the results:
-- DeepAR has the lowest MAE and MAPE - best accuracy
-- SimpleFeedForward is slightly worse but trained 10x faster
-- DeepNPTS is in between - good for transitional periods
-
-All three models have reasonable CRPS scores, meaning their uncertainty estimates are well-calibrated."
-
-**[Deepika runs comparison visualization cell]:**
-
-"Here's a visual comparison. This bar chart shows:
-- DeepAR wins on accuracy metrics
-- SimpleFeedForward best on speed
-- DeepNPTS best for distribution flexibility
-
-The choice depends on your priorities: accuracy, speed, or adaptability."
-
-**[Deepika runs scenario analysis cells]:**
+#### Cells 35-37: DeepNPTS Introduction and Configuration
 
 **[Deepika speaks]:**
 
-"Now for scenario analysis - this is where GluonTS really shines for public health.
+"Thank you Utkrisht! Now I'll demonstrate **DeepNPTS** - Deep Non-Parametric Time Series.
 
-We simulate three intervention scenarios:
+DeepNPTS is special - it doesn't assume your data follows any particular distribution like normal or Poisson. Instead, it **learns the distribution directly from your data**.
 
-**Baseline**: No intervention, current trends continue
+This is crucial for COVID-19 because:
+- Each wave behaves differently
+- Delta variant ≠ Omicron variant
+- The distribution of cases changes over time (regime shifts)
+- We don't want to force-fit a Gaussian or Poisson when reality is more complex
 
-**Moderate Intervention**: 20% mobility reduction (like mask mandates, capacity limits)
+Use DeepNPTS when:
+- Your data distribution keeps changing
+- You have regime shifts (patterns shift over time)
+- You see unusual, non-standard distributions
+- Standard assumptions don't fit your data"
 
-**Strong Intervention**: 40% mobility reduction (like lockdowns, school closures)
+**[Deepika runs Cell 37 - Configure DeepNPTS]:**
 
-Let me run these scenarios..."
+**[Deepika explains configuration]:**
 
-**[Cells run, showing different forecast outcomes]:**
+"DeepNPTS configuration is similar to DeepAR but with key differences:
+
+**Same as DeepAR:**
+- `freq='D'`: Daily data
+- `prediction_length=14`: 14-day forecast
+- `context_length=60`: 60-day lookback
+- `num_feat_dynamic_real=3`: Uses external features (deaths, CFR)
+
+**Different from DeepAR:**
+- `epochs=10` - passed directly, NOT via `trainer_kwargs`!
+  - This is a quirk of DeepNPTS's API
+  
+- `num_hidden_nodes=[40, 40]` - NOT `hidden_size`!
+  - Uses list of layer sizes like SimpleFeedForward
+  - But unlike SimpleFeedForward, it DOES use features
+
+**What makes it 'non-parametric'?**
+- Most models say: 'I assume your errors are normally distributed'
+- DeepNPTS says: 'Show me your data, I'll figure out the distribution'
+- This flexibility helps with COVID's changing nature"
+
+**[Output confirms configuration]:**
+
+"Configuration set for 14-day forecasting with non-parametric distribution learning."
+
+---
+
+#### Cells 38-39: Train DeepNPTS
+
+**[Deepika runs Cell 39 - Train DeepNPTS]:**
+
+**[Deepika speaks during training]:**
+
+"Training DeepNPTS now. Speed-wise, it's between DeepAR and SimpleFeedForward:
+- Slower than SimpleFeedForward (has more complexity)
+- Comparable to DeepAR (similar architecture)
+- Takes about 1-2 minutes
+
+Watch the training loss:
+- Starting around 12.63
+- Decreasing steadily to 12.42
+- This shows the model is learning the data distribution
+
+The non-parametric aspect means:
+- It's learning not just 'what's the average' but 'what's the full shape of possible outcomes'
+- More flexible but requires careful training"
+
+**[Training completes]:**
+
+"Training complete! DeepNPTS has learned the distribution of COVID-19 cases without making rigid assumptions."
+
+---
+
+#### Cells 40-41: Generate DeepNPTS Forecasts
+
+**[Deepika runs Cell 41 - Generate Forecasts]:**
+
+**[Deepika speaks]:**
+
+"Generating 100 sample forecasts for uncertainty quantification.
+
+**Output shows:**
+- Mean prediction: ~45,000 cases per day
+- Forecast range: 40,000 to 48,000 cases
+- 90% confidence interval: much wider - 11,000 to 76,000
+
+**Interesting comparison:**
+- DeepAR: ~49k mean
+- SimpleFeedForward: ~48k mean
+- DeepNPTS: ~45k mean
+
+DeepNPTS is predicting lower cases! Why?
+- It might be adapting to the most recent declining trend
+- The non-parametric nature makes it more responsive to recent changes
+- Less anchored to historical average patterns
+
+Also notice the very wide confidence interval:
+- DeepNPTS is saying 'there's high uncertainty here'
+- This honesty about uncertainty is valuable for planning"
+
+---
+
+#### Cell 43: Visualize DeepNPTS Predictions
+
+**[Deepika runs Cell 43]:**
+
+**[Graph appears with orange forecast line]:**
+
+**[Deepika speaks while analyzing the visualization]:**
+
+"This is DeepNPTS's forecast visualization. Let me highlight what's different:
+
+**The forecast (orange):**
+- Mean prediction: Lower than DeepAR and SimpleFeedForward
+- Confidence bands: Noticeably wider, especially in later days
+- Shape: Follows the declining trend more aggressively
+
+**Comparing all three models visually:**
+
+1. **Trend capturing:**
+   - DeepNPTS: Most aggressive decline
+   - DeepAR: Moderate decline
+   - SimpleFeedForward: Smooth, stable decline
+
+2. **Uncertainty quantification:**
+   - DeepNPTS: Widest confidence intervals (most honest about uncertainty)
+   - DeepAR: Moderate confidence intervals
+   - SimpleFeedForward: Narrower intervals (perhaps overconfident)
+
+3. **Actual values:**
+   - Some orange dots are closer to DeepNPTS in later days
+   - DeepNPTS might be capturing the recent regime shift better
+
+**What this demonstrates:**
+- Different models, different perspectives on the future
+- DeepNPTS's flexibility shows in its adaptive predictions
+- Wide uncertainty is appropriate for volatile data like COVID-19
+- In practice, you'd ensemble multiple models for robust forecasts"
+
+---
+
+#### Cell 45: Evaluate DeepNPTS Performance
+
+**[Deepika runs Cell 45]:**
+
+**[Deepika speaks]:**
+
+"Performance metrics for DeepNPTS:
+
+**Output shows:**
+- MAE: 12,785 cases - **Best of all three models!**
+- RMSE: 13,303 cases - Also best!
+- MAPE: 36.6% - Also best!
+
+**This is surprising and informative:**
+- DeepNPTS actually outperformed DeepAR and SimpleFeedForward
+- Lower mean prediction turned out more accurate for this test period
+- Non-parametric flexibility helped adapt to recent trends
+
+**Why did it perform better?**
+1. The test period (March 2023) was during a declining trend
+2. DeepNPTS adapted more quickly to this regime
+3. It wasn't constrained by distributional assumptions
+4. The recent pattern was more important than historical average
+
+**Output says 'Good performance!'** - and indeed, 36.6% MAPE is better than the others' 40.2%."
+
+---
+
+#### Cell 46: Model Comparison Summary
+
+**[Deepika reads the comparison table]:**
+
+"The notebook provides a helpful summary comparing all three:
+
+**DeepAR:**
+- Best for: Complex patterns, seasonality
+- Speed: Slow (2-3 min)
+- Accuracy: Good baseline
+- Uncertainty: Well-calibrated
+- When to use: Need maximum pattern recognition
+
+**SimpleFeedForward:**
+- Best for: Speed, simplicity
+- Speed: Very fast (30 sec)
+- Accuracy: Comparable to DeepAR
+- Uncertainty: Adequate
+- When to use: Quick experiments, rapid retraining
+
+**DeepNPTS:**
+- Best for: Regime changes, distribution shifts
+- Speed: Medium (1-2 min)
+- Accuracy: Best in our test!
+- Uncertainty: Honest, wide intervals
+- When to use: Volatile data, changing patterns
+
+**In practice for COVID-19 forecasting:**
+- Use all three and compare
+- DeepAR for understanding historical patterns
+- SimpleFeedForward for daily quick checks
+- DeepNPTS during transitions (new variants, policy changes)
+- Ensemble them for robust forecasts"
+
+---
+
+**[Deepika wraps up API notebook]:**
+
+"That concludes our API demonstration! We've shown you:
+- How to configure each model
+- How to train and generate forecasts
+- How to evaluate and visualize results
+- When to use each model
+
+Key takeaway: **Different models for different scenarios**. GluonTS gives you options!"
+
+---
+
+### PART B: Example Notebook - Complete Application
+
+**[Deepika transitions]:**
+
+"Now let's move to the **example notebook** - our complete COVID-19 forecasting application. This shows how to use GluonTS in a real-world scenario.
+
+Let me open `GluonTS.example.ipynb`..."
+
+**[Opens GluonTS.example.ipynb]:**
+
+---
+
+### ALL THREE - Example Notebook Walkthrough (3-4 minutes)
+
+**[Harsh takes lead for introduction]:**
+
+#### Cells 0-3: Problem Statement and Setup
+
+**[Harsh speaks]:**
+
+"The example notebook addresses a real-world problem:
+
+**Problem:** Hospitals need to predict COVID-19 cases 14 days ahead to:
+- Allocate ICU beds and ventilators
+- Schedule healthcare staff appropriately
+- Plan intervention strategies
+- Communicate risk to the public
+
+**Our solution:** A complete forecasting system using all three GluonTS models.
+
+Let me run the setup cells..."
+
+**[Harsh runs Cells 1-3 quickly]:**
+
+"Same imports and data loading. The difference is this notebook focuses on the complete application workflow, not teaching the API."
+
+---
+
+#### Cells 4-5: Data Exploration
+
+**[Utkrisht takes over]:**
+
+**[Utkrisht runs Cell 4 - Data visualization]:**
+
+"This comprehensive visualization shows:
+- Multiple COVID waves over 3 years
+- Weekly seasonality patterns
+- The features we're using: deaths and mobility
+- Clear correlation between decreased mobility and case declines
+
+This justifies our feature selection - deaths and mobility DO help predict cases."
+
+---
+
+#### Cells 6-12: Training All Three Models
+
+**[Deepika takes over]:**
+
+**[Deepika speaks]:**
+
+"For time, I'll show the training outputs we've already run. In a live demo, this would take about 6-7 minutes total.
+
+The notebook trains:
+1. DeepAR with full features
+2. SimpleFeedForward as baseline
+3. DeepNPTS for distribution flexibility
+
+All use the same 60-day context, 14-day forecast configuration for fair comparison."
+
+**[Scrolls through training outputs]:**
+
+"You can see each model trained successfully, with decreasing loss values indicating learning."
+
+---
+
+#### Cells 13-18: Model Comparison
+
+**[Harsh takes over]:**
+
+**[Harsh runs comparison cells]:**
+
+**[A comparison table appears]:**
+
+**[Harsh speaks]:**
+
+"This is the key result - comparing all three models side by side:
+
+**Metrics comparison:**
+- MAE, RMSE, MAPE for accuracy
+- CRPS for probabilistic forecast quality
+- Training time for practical considerations
+
+**Typical findings:**
+- DeepAR: Best for seasonal patterns, moderate training time
+- SimpleFeedForward: Fastest, good baseline accuracy
+- DeepNPTS: Best for this test period, adaptive to recent trends
+
+**Visualization:**
+A bar chart shows these metrics visually - easy to communicate to stakeholders."
+
+---
+
+#### Cells 19-22: Scenario Analysis
+
+**[Utkrisht takes over]:**
+
+**[Utkrisht speaks]:**
+
+"Now the most powerful feature - scenario analysis. This is where probabilistic forecasting shines for public health decision-making.
+
+We simulate three scenarios:
+1. **Baseline:** No intervention, current trends continue
+2. **Moderate:** 20% mobility reduction (mask mandates, capacity limits)
+3. **Strong:** 40% mobility reduction (lockdowns, school closures)"
+
+**[Runs scenario cells]:**
+
+**[Output shows three different forecast trajectories]:**
+
+**[Utkrisht explains]:**
 
 "Look at the results:
-- Baseline: 65,000 cases expected (±8,000)
-- Moderate: 52,000 cases (20% reduction)
-- Strong: 38,000 cases (42% reduction)
+- Baseline: 65,000 cases expected
+- Moderate intervention: 52,000 cases (20% reduction)
+- Strong intervention: 38,000 cases (42% reduction)
 
-This quantifies intervention impact! Decision-makers can now:
-- Balance health vs economic costs
-- Plan resource allocation
-- Communicate risk clearly to the public
+**Real-world value:**
+- Decision-makers can see quantified intervention impact
+- Balance health benefits vs economic costs
+- Plan resources based on chosen scenario
+- Communicate tradeoffs clearly to public
 
-This is the power of probabilistic forecasting - not just predicting what will happen, but exploring what could happen under different scenarios."
+This is why GluonTS is powerful - not just predicting one future, but exploring multiple possible futures."
+
+---
+
+**[Deepika wraps up Step 5]:**
+
+"That completes our project walkthrough! We've demonstrated:
+- How each GluonTS model works (API notebook)
+- A complete COVID-19 forecasting application (example notebook)
+- Model comparison and selection
+- Scenario analysis for decision support
+
+Key achievement: **Production-ready forecasting system in under 10 minutes of code execution.**"
 
 ---
 
@@ -367,284 +963,325 @@ This is the power of probabilistic forecasting - not just predicting what will h
 ### Key Findings
 
 **1. Model Performance:**
-- DeepAR achieved the best accuracy with MAE around 2,500 cases and MAPE around 5%
-- This means we can forecast COVID-19 cases 14 days ahead with roughly 5% error
-- For hospitals expecting 50,000 cases, they can plan for 47,500-52,500 with high confidence
-- This level of accuracy is sufficient for resource planning
+- DeepAR, SimpleFeedForward, and DeepNPTS all achieved MAPE between 36-40%
+- For 14-day COVID forecasts, this is reasonable given the data's volatility
+- DeepNPTS performed best on our test period (36.6% MAPE)
+- SimpleFeedForward was competitive despite being 10x faster
 
 **2. Uncertainty Quantification:**
-- Our 90% confidence intervals captured actual values most of the time
-- The uncertainty bounds ranged from ±8,000 cases
-- This tells hospitals: 'plan for the average, but be ready for ±15% variance'
-- Better than point forecasts that give false precision
+- All models provided confidence intervals
+- DeepNPTS had widest intervals (most honest about uncertainty)
+- 90% confidence intervals typically ±15,000 cases
+- This tells hospitals: 'Plan for average, prepare for variance'
 
-**3. Model Comparison Insights:**
-- DeepAR: Best for accuracy, worth the 2-3 minute training time
-- SimpleFeedForward: 10x faster, only 20% accuracy loss - great for rapid updates
-- DeepNPTS: Best during wave transitions and new variants
+**3. Speed vs Accuracy Trade-offs:**
+- SimpleFeedForward: 30 seconds, 40% MAPE
+- DeepNPTS: 1-2 minutes, 37% MAPE
+- DeepAR: 2-3 minutes, 40% MAPE
+- For daily retraining, SimpleFeedForward's speed advantage matters
 
-**4. Scenario Analysis Value:**
-- We quantified that moderate interventions could reduce cases by 20%
-- Strong interventions could cut cases by 42%
-- This directly informs policy decisions
-- Example: If hospitals can handle 40,000 cases, strong intervention is needed
+**4. Scenario Analysis Impact:**
+- Moderate interventions: 20% case reduction
+- Strong interventions: 42% case reduction
+- Quantifies policy options for decision-makers
 
 ### How GluonTS Solved Our Problem
 
-**Problem**: Hospitals need 14-day case forecasts for resource planning
+**Problem:** Hospitals need 14-day forecasts for resource planning
 
 **GluonTS provided:**
 
-1. **Multiple model options**: We could compare three approaches and choose the best
+1. **Multiple modeling approaches:** Compare and choose best for situation
 
-2. **Probabilistic forecasts**: Not just 'we expect 50,000 cases' but 'we expect 50,000 ± 8,000 with 90% confidence'
+2. **Probabilistic forecasts:** Not just point predictions but full uncertainty quantification
 
-3. **Feature integration**: We incorporated deaths and mobility data to improve accuracy
+3. **Feature integration:** Leverage deaths and mobility data for better accuracy
 
-4. **Scenario simulation**: We could test 'what if' interventions before implementing them
+4. **Scenario simulation:** Test interventions before implementing
 
-5. **Production-ready**: Fast enough to retrain daily as new data arrives
+5. **Production-ready speed:** Fast enough for daily retraining
 
 ### Real-World Impact
 
-If this system were deployed:
-- Hospitals could allocate ICU beds 2 weeks in advance
-- Staff schedules could be optimized
-- Supply chains for PPE and ventilators could be managed
-- Public health officials could evaluate policies quantitatively
-- Communication to public would be more transparent with uncertainty
+If deployed, this system enables:
+- **ICU bed allocation:** 2 weeks advance notice for capacity planning
+- **Staff scheduling:** Optimize healthcare worker assignments
+- **Supply chain management:** Order PPE and ventilators proactively
+- **Policy evaluation:** Quantify intervention effects before implementing
+- **Public communication:** Transparent uncertainty bounds build trust
 
 ### Technical Achievements
 
-1. **Data pipeline**: Automated download, preprocessing, and merging of three data sources
-
-2. **Model training**: Three models trained in under 10 minutes total on CPU
-
-3. **Comprehensive evaluation**: Multiple metrics and visualizations
-
-4. **Modular design**: Utility functions make it easy to extend or modify
-
-5. **Reproducibility**: Docker ensures it works on any machine
+1. **Automated data pipeline:** Downloads, preprocesses, merges three data sources
+2. **Fast training:** All three models in under 10 minutes on CPU
+3. **Comprehensive evaluation:** Multiple metrics and visualizations
+4. **Modular design:** Easy to extend with new models or features
+5. **Reproducibility:** Docker ensures consistent environment
 
 ### Limitations and Future Work
 
-**Limitations:**
-- 14-day horizon is near-term; longer forecasts would be less accurate
-- Requires regular retraining as new data arrives
-- Assumes historical patterns continue (doesn't predict new variants)
+**Current limitations:**
+- 14-day horizon only (longer forecasts would be less accurate)
+- Requires daily retraining for best results
+- Assumes historical patterns continue (can't predict entirely new variants)
+- National-level only (state/county forecasts would need more data)
 
 **Future improvements:**
-- Add vaccination data to improve predictions
-- Implement automatic retraining pipeline
-- Extend to state-level forecasts for regional planning
-- Integrate with real-time hospital capacity data
+- Add vaccination data (already in data/ folder)
+- Implement automated daily retraining pipeline
+- Extend to state and county-level forecasts
+- Integrate real-time hospital capacity data
+- Ensemble all three models for robust predictions
+- Add external data: weather, genomic surveillance, policy indices
 
-In summary, GluonTS provided a complete, production-ready solution for COVID-19 forecasting that directly addresses hospital resource planning needs with quantified uncertainty."
+### Bottom Line
+
+GluonTS enabled a complete, production-ready COVID-19 forecasting system that:
+- Provides actionable 14-day forecasts with uncertainty
+- Runs fast enough for operational use
+- Supports scenario-based decision making
+- Can be deployed immediately for real-world impact
+
+The hard difficulty was justified by:
+- Multiple complex models integrated
+- Sophisticated data pipeline with auto-download
+- Probabilistic forecasting with uncertainty
+- Scenario analysis capabilities
+- Production-ready Docker deployment"
 
 ---
 
 ## DEEPIKA - Step 7: Documentation Review (2-3 minutes)
 
-**[Deepika takes over, shows file browser]:**
+**[Deepika takes over, shares file browser]:**
 
 **[Deepika speaks]:**
 
-"Now let me show you how our documentation is organized for both technical and non-technical readers.
+"Now let me show how our documentation serves both technical and non-technical audiences.
 
 ### Documentation Structure
 
-We have three main documentation files, each serving a different purpose:
+We have three main documentation files:
 
-**[Deepika opens README.md]:**
+**[Opens README.md]:**
 
-"**README.md** - The starting point
+### README.md - The Entry Point
 
-This is what someone sees first when they visit our repository. It includes:
+"This is what anyone sees first. It's organized for quick access:
 
-1. **Quick start section**: How to get up and running in 5 minutes
-   - Clone repo
-   - Build Docker
-   - Run Jupyter
-   - Open notebooks
+**1. Quick Start (top section):**
+- Clone repo
+- Build Docker: `./docker_build.sh`
+- Run Jupyter: `./docker_jupyter.sh`
+- Open notebooks
+- 5-minute setup, anyone can do it
 
-2. **Project overview**: Brief description of what we're solving
+**2. Visual Documentation:**
+Scroll down... see these Mermaid diagrams:
+- Data pipeline flow: Shows how data moves from files → preprocessing → models
+- Project structure: Clear hierarchy of components
+- **Non-technical readers** can understand the workflow without reading code
 
-3. **Mermaid diagrams**: Visual representation of the data pipeline and workflow
-   - See how data flows from source files through preprocessing to models
-   - No need to read code to understand the process
+**3. Data Setup Section:**
+Explains automatic data download:
+- System checks for files
+- Downloads from Google Drive if missing
+- Manual instructions if automatic fails
+- Clear, step-by-step
 
-4. **Data setup instructions**: Clear steps for data download
-   - Automatic download from Google Drive
-   - Manual instructions if automatic fails
-   - Direct links to each file
+**4. Expected Outputs:**
+Shows what you should see in terminal:
+- Docker build success messages
+- Jupyter server startup
+- No confusion or surprises
 
-5. **Expected outputs**: What you should see when running scripts
-   - Example terminal outputs
-   - No surprises or confusion
+**Who can use this?**
+- Project managers: Understand what we built
+- Developers: Get up and running quickly
+- Stakeholders: See the workflow visually
+- Students: Learn and replicate our work"
 
-**A non-technical reader** like a project manager or stakeholder can read this and understand:
-- What the project does
-- How to run it
-- What to expect
-- Where to get help
+---
 
-**[Deepika opens GluonTS.API.md]:**
+**[Opens GluonTS.API.md]:**
 
-"**GluonTS.API.md** - Tool-focused documentation
+### GluonTS.API.md - Tool Reference
 
-This explains GluonTS itself, not our specific project. It's organized as:
+**[Deepika scrolls through]:**
 
-1. **Model overview**: What each model does in plain English
-   - DeepAR: 'Uses memory to learn patterns'
-   - SimpleFeedForward: 'Fast and simple'
-   - DeepNPTS: 'Adapts to changing distributions'
+"This is **tool-focused documentation** - explains GluonTS itself, NOT our COVID project.
 
-2. **When to use each model**: Decision guide
-   - Complex patterns → DeepAR
-   - Need speed → SimpleFeedForward
-   - Regime changes → DeepNPTS
+**Structure:**
 
-3. **Parameter explanations**: What each setting does
-   - `context_length`: 'Historical window size'
-   - `prediction_length`: 'How far ahead to forecast'
-   - No jargon, clear examples
+**1. Model Overview:**
+- DeepAR: 'Uses RNNs for complex patterns'
+- SimpleFeedForward: 'Direct mapping, fast and simple'
+- DeepNPTS: 'Learns distribution, adapts to changes'
+- Plain English, no jargon
 
-4. **Basic usage pattern**: Step-by-step code examples
-   - Prepare data
-   - Configure model
-   - Train
-   - Forecast
-   - Interpret results
+**2. When to Use Each Model:**
+Decision guide:
+- Complex seasonality → DeepAR
+- Need speed → SimpleFeedForward
+- Regime changes → DeepNPTS
 
-5. **Common issues and solutions**: Troubleshooting guide
-   - 'Training too slow' → reduce epochs or try SimpleFeedForward
-   - 'Wrong number of features' → check num_feat_dynamic_real
+**3. Parameter Reference:**
+Every parameter explained:
+- `context_length`: 'How much history to use'
+- `prediction_length`: 'How far ahead to forecast'
+- `num_feat_dynamic_real`: 'Number of external features'
+- Includes typical values and effects
 
-**A technical reader** like a data scientist can use this as a reference to:
-- Learn GluonTS APIs
-- Understand parameters
-- Troubleshoot issues
-- Apply to their own projects
+**4. Basic Usage Pattern:**
+Step-by-step code examples:
+- Prepare data
+- Configure model
+- Train
+- Forecast
+- Interpret
+Generic examples - work for ANY time series problem
 
-**Important**: This documentation is generic - it doesn't mention COVID-19. Someone could use it for sales forecasting, traffic prediction, or any time series problem.
+**5. Troubleshooting:**
+Common issues and solutions:
+- 'Training too slow' → reduce epochs
+- 'Wrong number of features' → check num_feat_dynamic_real
+- Practical fixes
 
-**[Deepika opens GluonTS.example.md]:**
+**Who can use this?**
+- Data scientists applying GluonTS to their own problems
+- Students learning time series forecasting
+- Developers building forecasting systems
+- Anyone needing a GluonTS reference
 
-"**GluonTS.example.md** - Project-focused documentation
+**Key point:** No COVID-19 specifics here. This is reusable for sales, traffic, weather, anything!"
 
-This explains our specific COVID-19 project. Structure:
+---
 
-1. **Project overview**: Problem statement and motivation
-   - 'Hospitals need 14-day forecasts'
-   - 'Resource allocation requires planning'
-   - Real-world context
+**[Opens GluonTS.example.md]:**
 
-2. **Data sources**: What data we use and why
-   - Cases from JHU
-   - Deaths from JHU
-   - Mobility from Google
-   - Explains why each feature matters
+### GluonTS.example.md - Project Documentation
 
-3. **Feature engineering rationale**: Why we created specific features
-   - 7-day moving average: 'Smooths weekend reporting'
-   - CFR: 'Indicates healthcare strain'
-   - Technical decisions explained in plain language
+**[Deepika scrolls through]:**
 
-4. **Model selection**: Why we chose these three models for COVID-19
-   - DeepAR: 'COVID has complex waves'
-   - SimpleFeedForward: 'Fast baseline'
-   - DeepNPTS: 'Each variant behaves differently'
+"This is **project-focused** - explains our specific COVID-19 application.
 
-5. **Notebook walkthrough**: Section-by-section explanation
-   - What happens in each cell
-   - What outputs to expect
-   - How to interpret results
+**Structure:**
 
-6. **Results interpretation**: What the numbers mean
-   - 'MAE of 2,500 means...'
-   - 'Confidence intervals tell us...'
-   - Domain-specific insights
+**1. Project Overview:**
+- Problem statement: 'Hospitals need 14-day forecasts'
+- Why it matters: Resource allocation, staff planning
+- Real-world context
 
-7. **Scenario analysis**: Real-world application
-   - 'Moderate intervention reduces cases by 20%'
-   - 'Helps policy decisions'
-   - Practical value demonstrated
+**2. Data Sources:**
+- Cases from JHU
+- Deaths from JHU
+- Mobility from Google
+- Explains WHY each matters for forecasting
 
-**A non-technical reader** like a hospital administrator can read this and understand:
-- Why this matters for their work
-- What the forecasts mean
-- How to use results for planning
-- What scenarios they could explore
+**3. Feature Engineering Rationale:**
+- 7-day moving average: 'Smooths weekend reporting artifacts'
+- CFR: 'Indicates healthcare strain'
+- Mobility: 'Captures behavioral changes'
+- Technical decisions in plain language
 
-**A technical reader** can understand:
-- Complete methodology
-- Design decisions and tradeoffs
-- How to reproduce or extend the work
-- Domain-specific considerations
+**4. Model Selection for COVID-19:**
+Why we chose these three:
+- DeepAR: 'COVID has multiple complex waves'
+- SimpleFeedForward: 'Fast baseline, good for stable periods'
+- DeepNPTS: 'Each variant behaves differently'
+- Domain-specific reasoning
+
+**5. Notebook Walkthrough:**
+Section-by-section explanation:
+- What each cell does
+- Expected outputs
+- How to interpret results
+- Complete guide for running
+
+**6. Results Interpretation:**
+- 'MAE of 13,000 means we're off by 13k cases on average'
+- '90% CI of ±15k tells hospitals the range to prepare for'
+- 'Scenario analysis shows 20% reduction with moderate intervention'
+- Translates numbers to actionable insights
+
+**7. Real-World Application:**
+- How hospitals would use this
+- Policy implications
+- Communication to public
+- Practical value demonstrated
+
+**Who can use this?**
+- Hospital administrators: Understand forecasts for their work
+- Public health officials: Evaluate interventions quantitatively
+- Policy makers: See cost-benefit of different scenarios
+- Technical reviewers: Understand complete methodology
+- Students: Learn applied forecasting in real domain
+
+**Key point:** Everything specific to COVID-19 and this project is here, NOT in API.md"
+
+---
 
 ### How Documentation Works Together
 
-**For someone new to the project:**
+**[Deepika explains the flow]:**
 
-1. **Start with README.md**: Get overview, run the code
-2. **Read GluonTS.example.md**: Understand our COVID-19 application
-3. **Reference GluonTS.API.md**: Learn details about the tools
+"For different users:
 
-**For someone wanting to adapt our work:**
+**Scenario 1: Student wanting to learn GluonTS**
+1. README.md → Get overview, set up environment
+2. GluonTS.API.md → Learn the tool thoroughly
+3. GluonTS.example.ipynb → See it applied to real problem
+4. Adapt to their own project
 
-1. **Read GluonTS.API.md**: Learn the tool
-2. **Use our utilities**: Reuse our code structure
-3. **Follow our pattern**: Apply to their own problem
+**Scenario 2: Hospital administrator evaluating our work**
+1. README.md → Understand what we built (Mermaid diagrams!)
+2. GluonTS.example.md → See how it solves their problem
+3. GluonTS.example.ipynb → View actual forecasts
+4. Decide if it meets their needs
 
-### Documentation Quality Highlights
+**Scenario 3: Developer extending our work**
+1. README.md → Setup environment
+2. GluonTS.API.md → Reference for parameters
+3. Utility modules → Reuse our code
+4. Build their own application
+
+### Documentation Quality
 
 **Completeness:**
 - Every file explained
-- Every parameter documented
-- Every result interpreted
-- Nothing is mysterious
+- Every function documented
+- Every parameter described
+- All results interpreted
 
 **Clarity:**
-- Plain language, no unexplained jargon
-- Examples throughout
-- Visual diagrams in README
-- Step-by-step instructions
+- Plain language, minimal jargon
+- Progressive complexity (simple → advanced)
+- Visual aids (diagrams, charts)
+- Real examples throughout
 
 **Accessibility:**
-- Beginner-friendly explanations
+- Multiple entry points (API vs example)
 - 'What' and 'Why' before 'How'
 - Troubleshooting sections
-- Multiple entry points (API vs example)
+- Both technical and non-technical explanations
 
-**Professional presentation:**
+**Professional Standards:**
 - Consistent formatting
 - Logical organization
 - Clear section headers
-- No emojis or casual language
-- Appropriate for academic submission
-
-### Quick Navigation Demo
-
-**[Deepika shows quick scroll through each file]:**
-
-"Notice how easy it is to find information:
-- Clear section headers
-- Table of contents in longer docs
-- Code examples highlighted
-- Results sections clearly marked
-
-A reader can quickly find what they need without reading everything."
+- Academic-appropriate tone
+- No emojis or overly casual language"
 
 ---
 
 **[Deepika concludes]:**
 
-"In summary, our documentation serves multiple audiences:
-- **README.md**: Everyone - quick start
-- **GluonTS.API.md**: Technical users - tool reference
-- **GluonTS.example.md**: All users - project explanation
+"In summary, our documentation architecture:
+- **README.md:** Everyone - quick start and overview
+- **GluonTS.API.md:** Technical users - tool reference
+- **GluonTS.example.md:** All users - project explanation
 
-Whether you're a hospital administrator, a data scientist, or a student, you can understand our project and use our work."
+Whether you're a hospital administrator, a data scientist, a student, or a policy maker, you can understand our work and use it appropriately."
 
 ---
 
@@ -652,17 +1289,26 @@ Whether you're a hospital administrator, a data scientist, or a student, you can
 
 **[Harsh wraps up]:**
 
-"Thank you for watching our demonstration. 
+"Thank you for watching our demonstration!
 
-To summarize:
-- We built a COVID-19 case forecasting system using GluonTS
-- We compared three models: DeepAR, SimpleFeedForward, and DeepNPTS
-- We achieved 5% forecast error for 14-day predictions
-- We demonstrated scenario analysis for intervention planning
-- Our complete implementation is reproducible via Docker
-- Comprehensive documentation serves technical and non-technical audiences
+**Summary of what we achieved:**
 
-This project demonstrates how modern probabilistic forecasting tools like GluonTS can support real-world public health decision-making.
+1. **Complete forecasting system** using three GluonTS models
+2. **14-day COVID-19 forecasts** with 36-40% MAPE accuracy
+3. **Probabilistic predictions** with uncertainty quantification
+4. **Scenario analysis** for intervention planning
+5. **Production-ready** Docker deployment
+6. **Comprehensive documentation** for all audiences
+7. **Modular, reusable** code architecture
+
+**Key takeaway:** GluonTS enables sophisticated probabilistic forecasting that directly supports real-world public health decision-making.
+
+Our hard-difficulty project demonstrates:
+- Multiple complex models integrated and compared
+- Automated data pipeline with error handling
+- Advanced uncertainty quantification
+- Scenario-based decision support
+- Professional documentation and deployment
 
 Questions?"
 
@@ -670,16 +1316,17 @@ Questions?"
 
 ## TIMING BREAKDOWN
 
-- **Harsh (Steps 1-4)**: 2 minutes
-- **All 3 (Step 5)**: 12-15 minutes
-  - Harsh: 4 minutes (intro, setup, data)
-  - Utkrisht: 5 minutes (training)
-  - Deepika: 4 minutes (evaluation)
-- **Utkrisht (Step 6)**: 3 minutes
-- **Deepika (Step 7)**: 3 minutes
+- **Harsh (Steps 1-4)**: 2-3 minutes
+- **All 3 (Step 5)**:12-15 minutes
+  - Harsh - DeepAR (API): 4-5 minutes
+  - Utkrisht - SimpleFeedForward (API): 3-4 minutes
+  - Deepika - DeepNPTS (API): 3-4 minutes
+  - All - Example notebook: 3-4 minutes
+- **Utkrisht (Step 6)**: 2-3 minutes
+- **Deepika (Step 7)**: 2-3 minutes
 - **Closing**: 0.5 minutes
 
-**Total**: 15-20 minutes (with buffer for questions)
+**Total: 18-25 minutes** (aim for 20 minutes)
 
 ---
 
@@ -687,58 +1334,41 @@ Questions?"
 
 ### Before Recording
 
-1. **Practice run-through**: Do a complete dry run to check timing
-2. **Clear browser cache**: Start fresh for screen recording
-3. **Pre-run notebooks**: Run all cells beforehand so outputs are visible (or be prepared for 10-minute training wait)
-4. **Check audio**: Test microphone quality
-5. **Close unnecessary tabs/apps**: Clean desktop for professional appearance
-6. **Have backup plan**: If live demo fails, have screenshots ready
+1. **Practice multiple times:** Aim for smooth 20-minute delivery
+2. **Pre-run notebooks:** Have outputs visible (saves waiting for training)
+3. **Test screen recording:** Ensure good quality
+4. **Check audio:** Clear microphone
+5. **Clean desktop:** Professional appearance
+6. **Backup outputs:** Screenshots if live demo fails
 
 ### During Recording
 
-1. **Speak clearly and pace yourself**: Not too fast, not too slow
-2. **Zoom in on important outputs**: Make text readable in recording
-3. **Pause between sections**: Give viewers time to process
-4. **Point out key information**: Use mouse cursor to highlight
-5. **Explain as you go**: Don't just read the screen, interpret it
+1. **Speak clearly:** Not too fast, pause between sections
+2. **Zoom when needed:** Make code/outputs readable
+3. **Point with cursor:** Highlight important information
+4. **Explain, don't just read:** Interpret outputs
+5. **Maintain energy:** Stay engaged throughout
 
 ### Common Pitfalls to Avoid
 
-1. **Don't run cells that take forever**: Pre-run or skip heavy cells
-2. **Don't mumble through code**: Explain what it does, not just what it says
-3. **Don't skip errors**: If something fails, explain gracefully
-4. **Don't rush documentation review**: This is as important as code
-5. **Don't forget to conclude**: Summarize key points
+1. **Don't wait for training:** Use pre-run outputs
+2. **Don't rush documentation:** It's as important as code
+3. **Don't skip transitions:** Smooth handoffs between presenters
+4. **Don't ignore errors:** Explain them gracefully if they occur
+5. **Don't forget to conclude:** Summarize key achievements
 
-### Backup Scenarios
-
-**If Docker fails:**
-- "We encountered [issue], which we resolved by [solution]"
-- Show the fix in docker_jupyter.sh or Dockerfile
-- Proceed with pre-run notebook
-
-**If notebook takes too long:**
-- "This cell trains the model, which takes 2-3 minutes. Let me show you the pre-run output..."
-- Jump to pre-executed version
-
-**If internet/download fails:**
-- "Data download would happen automatically, but since we've already run this, the files are cached in the data/ folder"
-- Show files exist in data/
-
----
-
-## HAND-OFF PHRASES
-
-Use these to smoothly transition between presenters:
+### Hand-off Phrases
 
 **Harsh → Utkrisht:**
-"Now I'll hand it over to Utkrisht, who will demonstrate training our three models."
+"That's DeepAR! Now Utkrisht will demonstrate SimpleFeedForward."
 
 **Utkrisht → Deepika:**
-"Now Deepika will show you how we evaluate and compare these models."
+"Now Deepika will show DeepNPTS, our most flexible model."
 
-**Deepika → All:**
-"And now for our closing remarks."
+**Deepika → All (after example notebook):**
+"Now let's interpret these results. Utkrisht?"
 
-Good luck with your presentation! 🎓
+**After Step 6 → Step 7:**
+"And finally, let me review our documentation. Deepika?"
 
+Good luck with your presentation!
