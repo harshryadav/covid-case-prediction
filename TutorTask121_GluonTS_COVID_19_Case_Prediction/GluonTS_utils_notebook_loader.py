@@ -23,44 +23,73 @@ from GluonTS_utils_gluonts import (
 )
 
 
-def check_data_files(data_dir: str = "data") -> bool:
+def check_and_download_data(data_dir: str = "data") -> bool:
     """
-    Check if required data files exist.
+    Check if required data files exist, download if missing.
     
     Args:
         data_dir: Directory where data files should be
     
     Returns:
-        bool: True if all files present, False otherwise
+        bool: True if all files present or successfully downloaded
     """
     required_files = ['cases.csv', 'deaths.csv', 'mobility.csv']
     data_path = Path(data_dir)
+    data_path.mkdir(exist_ok=True)
     
+    # Check which files are missing
     missing = []
     for filename in required_files:
         if not (data_path / filename).exists():
             missing.append(filename)
     
-    if missing:
-        print("\n" + "="*70)
-        print("DATA FILES MISSING")
-        print("="*70)
-        print(f"\nThe following files are missing from '{data_dir}/' directory:")
-        for f in missing:
-            print(f"  - {f}")
+    if not missing:
+        return True
+    
+    # Files are missing - try to download
+    print("\n" + "="*70)
+    print("DATA FILES MISSING - ATTEMPTING DOWNLOAD")
+    print("="*70)
+    print(f"\nMissing files: {', '.join(missing)}")
+    print("Attempting to download from Google Drive...\n")
+    
+    # Import download function
+    try:
+        from GluonTS_utils_data_download import check_and_download_data as download_data
         
-        print("\nPlease download the data files:")
+        # Try to download
+        success = download_data(data_dir)
+        
+        if success:
+            print("\n" + "="*70)
+            print("DATA DOWNLOAD SUCCESSFUL")
+            print("="*70 + "\n")
+            return True
+        else:
+            # Download failed - show manual instructions
+            print("\n" + "="*70)
+            print("AUTOMATIC DOWNLOAD FAILED")
+            print("="*70)
+            print("\nPlease download the data files manually:")
+            print("1. Visit: https://drive.google.com/drive/folders/1qMDGBstdY8H2hYpz8xSolhzNOsVxNHMA")
+            print("2. Download these files and rename them:")
+            print("   - time_series_covid19_confirmed_US.csv -> cases.csv")
+            print("   - time_series_covid19_deaths_US.csv -> deaths.csv")
+            print("   - mobility_report_US.csv -> mobility.csv")
+            print(f"3. Place them in the '{data_dir}/' directory")
+            print("\nOr run manually: python GluonTS_utils_data_download.py")
+            print("="*70 + "\n")
+            return False
+            
+    except Exception as e:
+        # Download module not available or error occurred
+        print(f"\nAutomatic download not available: {e}")
+        print("\nPlease download the data files manually:")
         print("1. Visit: https://drive.google.com/drive/folders/1qMDGBstdY8H2hYpz8xSolhzNOsVxNHMA")
-        print("2. Download these files and rename them:")
-        print("   - time_series_covid19_confirmed_US.csv -> cases.csv")
-        print("   - time_series_covid19_deaths_US.csv -> deaths.csv")
-        print("   - mobility_report_US.csv -> mobility.csv")
+        print("2. Download and rename the files as shown above")
         print(f"3. Place them in the '{data_dir}/' directory")
-        print("\nAlternatively, run: python download_data.py")
         print("="*70 + "\n")
         return False
-    
-    return True
 
 
 def load_covid_data_for_gluonts(
@@ -97,11 +126,11 @@ def load_covid_data_for_gluonts(
     Returns:
         Dictionary with train_ds, test_ds, DataFrames, and metadata
     """
-    # Check if data files exist first
-    if not check_data_files(data_dir):
+    # Check if data files exist, download if missing
+    if not check_and_download_data(data_dir):
         raise FileNotFoundError(
             f"Required data files missing from '{data_dir}/' directory. "
-            "Please download them as instructed above."
+            "Please download them manually as instructed above."
         )
     
     print("=" * 70)
