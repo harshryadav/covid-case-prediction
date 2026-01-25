@@ -6,6 +6,20 @@ Probabilistic forecasting of COVID-19 daily cases using three GluonTS models: De
 
 ---
 
+## Quick Start
+
+```bash
+cd TutorTask121_GluonTS_COVID_19_Case_Prediction
+./docker_build.sh
+./docker_jupyter.sh
+```
+
+Open http://localhost:8888 and run:
+- `GluonTS.API.ipynb` - Learn the model APIs
+- `GluonTS.example.ipynb` - Complete forecasting application
+
+---
+
 ## Getting Started
 
 ### Prerequisites
@@ -342,4 +356,3 @@ The following data files should be in the `data/` directory:
 Download from: https://drive.google.com/drive/folders/1qMDGBstdY8H2hYpz8xSolhzNOsVxNHMA
 
 ---
-
