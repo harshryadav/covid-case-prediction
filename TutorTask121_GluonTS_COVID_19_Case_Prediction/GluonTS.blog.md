@@ -157,12 +157,12 @@ The 7-day moving average is crucial—it smooths out weekend reporting artifacts
 #### 3. Google Mobility Reports
 - **What**: How much people moved compared to baseline (pre-pandemic)
 - **Categories tracked**:
-  - 🛒 Retail & recreation
-  - 🛒 Grocery & pharmacy
-  - 🌳 Parks
-  - 🚇 Transit stations
-  - 🏢 Workplaces
-  - 🏠 Residential
+  - Retail & recreation
+  - Grocery & pharmacy
+  - Parks
+  - Transit stations
+  - Workplaces
+  - Residential
 
 **Why mobility matters**: When people stay home, transmission drops. When mobility increases, cases often follow (with a lag).
 
@@ -294,10 +294,10 @@ We measure how well our models did using:
 
 | Metric | What It Measures | Lower is Better? |
 |--------|------------------|------------------|
-| **MAE** (Mean Absolute Error) | Average prediction error | ✅ Yes |
-| **RMSE** (Root Mean Square Error) | Penalizes large errors more | ✅ Yes |
-| **MAPE** (Mean Absolute % Error) | Error as percentage (scale-free) | ✅ Yes |
-| **CRPS** | How well uncertainty is calibrated | ✅ Yes |
+| **MAE** (Mean Absolute Error) | Average prediction error | Yes |
+| **RMSE** (Root Mean Square Error) | Penalizes large errors more | Yes |
+| **MAPE** (Mean Absolute % Error) | Error as percentage (scale-free) | Yes |
+| **CRPS** | How well uncertainty is calibrated | Yes |
 
 A model with low MAPE but poorly calibrated uncertainty might be overconfident—it says "I'm 90% sure" but is wrong 30% of the time. CRPS catches this.
 
@@ -464,10 +464,10 @@ Once you've mastered the basics, consider these extensions:
 
 ### Apply to Other Domains
 The same techniques work for:
-- 📈 Sales forecasting
-- 🚗 Traffic prediction
-- 🌡️ Energy demand forecasting
-- 📊 Financial time series
+- Sales forecasting
+- Traffic prediction
+- Energy demand forecasting
+- Financial time series
 
 GluonTS is domain-agnostic—once you understand the pattern, you can forecast almost anything.
 
@@ -523,4 +523,4 @@ This tutorial is part of the **"Learn X in 60 Minutes"** series, designed to giv
 
 ---
 
-*Happy forecasting!* 🚀📈
+*Happy forecasting!*
