@@ -206,3 +206,9 @@ All functions have informal, helpful comments
 Docker environment works reliably for beginners
 Clear learning progression from basic concepts to advanced application
 No emojis or overly verbose documentation
+
+
+
+
+
+Cleaned up the GluonTS tutorial for readability: removed all emojis from code outputs across GluonTS_utils.py and both notebooks, fixed inconsistent indentation and redundant print wrappers, and updated the README to match actual import conventions. Also fixed two bugs -- compute_custom_metrics was comparing forecasts against the first 14 days of the pandemic (near-zero cases) instead of the last 14 (the actual test period), producing nonsensical metrics, and the module logger had no handler so all training/comparison output was silently swallowed in notebooks.
