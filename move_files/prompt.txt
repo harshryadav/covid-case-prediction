@@ -1,0 +1,208 @@
+Please take a look at the GluonTS_COVID19_Predicition folder. I want you to help me create a plan that we can execute later on to clean up and make this blog and tutorial better for a beginner that wants to learn GluonTS and probabilitic time series forecasting. 
+
+Things you can and can't do:
+- Do not create extra files. Use the files that I have provided and either build/improve upon them. Or even suggest better ways to reduce code and improve readability
+- Refrain from using emaojis everywhere, either in Marjdown or the code outputs. Keeo the code outputs clean and readable for a reader that runs them
+- Write good robust code that is readable, maintainable, and robust. Keep the code documented but do not make it overly verbose. Refrain from making the comments sound robotic, you should have a smoewhat informal yet also human like language when provinf comments in the code
+- Make sure that when most code is written in the GluonTS_utils.py file as our notebooks will import all bulky code from there so that when readers go through the Notebooks, they are only focused on learning the conents and visualizing it rather than going through the code. Remeber this is a tutorial think from a readers persepctive.
+- We will test things using the Jupyter Lab/Notebooks and running the Jupyter Notebooks to make sure things are working correctly.
+
+
+Below is what I have currently with the blog and tutorial. Please take a thorough look at make sure you understand end to end before creating the plan. In this folder we have two things:
+
+1. A blog (blog_GluonTS.md) that highlights GluonTS folloiwng this guideline (note that this is the Markdown raw text that I am providing based on what my mentor is requesting this blog to look like):
+
+---
+title: "Autogen in 60 Minutes"
+authors:
+  - PranavShashidhara
+  - gpsaggese
+date: 2026-02-21
+description:
+categories:
+  - AI Research
+  - Software Engineering
+---
+
+TL;DR: Learn how to build agentic AI systems using AutoGen in 60 minutes with
+hands-on examples including live market data debates and SEC filing analysis.
+
+<!-- more -->
+
+This tutorial's goal is to show you in 60 minutes:
+
+  - The basic API of AutoGen (an open-source framework for building agentic AI
+    systems)
+  - Concrete examples of using AutoGen to build agents that can debate and reason
+    investment strategies based on market data and SEC filings
+
+## AutoGen in 30 Seconds
+
+AutoGen is an open-source framework from Microsoft for building agentic AI
+systems made of multiple collaborating agents.
+
+Key capabilities:
+
+- **Layered APIs**: Message-passing agents, tool usage, and human-in-the-loop
+  workflows
+- **Autonomous planning**: Reasoning and execution of tasks such as coding,
+  browsing, and data processing
+- **Multi-language support**: Python and other languages, with extensible
+  integrations for LLM providers using OpenAI-style clients
+- **Rapid prototyping**: Helps developers quickly build applications from simple
+  assistants to coordinated teams of specialized AI agents
+
+## Official References
+
+- [AutoGen: A framework for building AI agents and applications](https://microsoft.github.io/autogen/)
+- [GitHub repo](https://github.com/microsoft/autogen)
+
+## Tutorial Content
+
+This tutorial includes all the code, notebooks, and Docker containers in
+`tutorials/Autogen/`.
+
+- `tutorials/Autogen/README.md`: Instructions and setup for the tutorial
+  environment
+- A Docker system to build and run the environment using our standardized
+  approach
+- `autogen.API.ipynb`: Tutorial notebook focusing on API configurations and
+  basic agent setup
+- `autogen.example.ipynb`: Advanced end-to-end agentic workflow example
+- `autogen_utils.py`: Utility functions required by `autogen.example.ipynb`
+
+## `autogen.example.ipynb`
+
+This notebook provides a practical, end-to-end example of using AutoGen to
+demonstrate a complete agentic workflow.
+
+### Part 1: Dynamic Market Debate and Live Data
+
+- Fetches real-time stock data from Yahoo Finance
+- Bull and Bear strategist agents debate market trends
+- Selector agent dynamically decides which expert to call at each step
+- Generates stock charts and financial summaries
+
+### Part 2: SEC Filings and Quantitative RAG Analysis
+
+Part 2 extends Part 1 by combining live market data with deep, structured
+analysis of SEC filings.
+
+- Pulls 10-K filings from SEC EDGAR and cleans them
+- Embeds documents into a **ChromaDB** vector database
+- Senior Quant Analyst agent queries the database to extract revenue splits,
+  risk factors, and other insights
+- Quant Runtime agent executes Python code locally to transform raw tables into
+  structured visualizations
+
+This example shows how multiple agents collaborate, use live data, leverage
+private databases via RAG, and produce actionable insights in a single
+integrated workflow.
+
+
+2. A tutorial (the rest of the files minus the blog_GluonTS.md) of GluonTS using synthetic and real COVID-19 data. This tutorial currently has that with some synthetic data that we generate and play around with the GluonTS library to showcase the user what it is and what it can do with various models that GluonTS supports. We then also show GluonTS in a real world scenario with US COVID-19 data (cases, deaths, and Google mobility). We do the same things training and testing on various models and also do scenario analysis as well. 
+
+
+
+
+
+
+
+
+
+
+
+Based on my examination of the GluonTS_COVID19_Prediction folder, I can see you have a comprehensive tutorial setup with a blog, utility functions, and two notebooks (API basics with synthetic data, and real-world COVID-19 example). The current structure is solid, but there are opportunities to clean up and improve it for beginners learning GluonTS and probabilistic forecasting.
+
+Current State Assessment
+Strengths:
+
+Blog is well-written and comprehensive, covering GluonTS introduction, models, and COVID-19 application
+Utils file has extensive functionality for data loading, preprocessing, models, and visualization
+Notebooks follow a good progression: synthetic data → real data
+Docker setup is complete with automated data download
+Clear separation of concerns (utils handle heavy lifting, notebooks focus on learning)
+Areas for Improvement:
+
+GluonTS_utils.py is 2600+ lines and overwhelming - needs better organization and cleanup
+Some redundant functions and inconsistent naming
+Code comments are somewhat robotic; need more informal, human-like language
+Notebooks could be cleaner with more code moved to utils
+Need to ensure smooth flow for beginners from basic concepts to advanced application
+Cleanup and Improvement Plan
+Here's the plan we can execute to make this tutorial better for beginners:
+
+Phase 1: Refactor GluonTS_utils.py (Priority: High)
+Goal: Make the utils file more maintainable and beginner-friendly by organizing into clear sections, removing redundancies, and improving code quality.
+
+Actions:
+
+Reorganize into logical modules: Split the massive file into focused sections with clear headers
+Remove redundant functions: Consolidate similar plotting/evaluation functions
+Standardize naming: Use consistent function naming (snake_case, descriptive names)
+Improve comments: Make them conversational and helpful, not robotic
+Add type hints: Ensure all functions have proper type annotations
+Create a clean API: Define a simple import interface for notebooks
+Target structure:
+
+Phase 2: Clean Up Notebooks (Priority: High)
+Goal: Make notebooks more focused on learning and less on implementation details.
+
+Actions:
+
+Move code to utils: Shift any remaining bulky code from notebooks to utils
+Improve explanations: Add more beginner-friendly explanations of concepts
+Standardize cell structure: Use consistent markdown/code cell patterns
+Add progress indicators: Show clear "what we're doing next" sections
+Reduce verbosity: Keep code clean and readable, focus on key learnings
+GluonTS.API.ipynb improvements:
+
+Better introduction to probabilistic forecasting concepts
+Clearer progression through synthetic data levels
+More intuitive model comparisons
+GluonTS.example.ipynb improvements:
+
+Streamlined COVID-19 data loading and exploration
+Cleaner model training and comparison sections
+Better scenario analysis presentation
+Phase 3: Update Blog and Documentation (Priority: Medium)
+Goal: Ensure blog aligns perfectly with the improved tutorial and provides better guidance.
+
+Actions:
+
+Update links: Ensure all notebook references are accurate
+Add troubleshooting: Include common issues and solutions
+Improve flow: Make sure blog → API notebook → example notebook progression is clear
+Update README: Reflect any changes in setup or file structure
+Phase 4: Testing and Validation (Priority: High)
+Goal: Ensure everything works smoothly for beginners.
+
+Actions:
+
+Test notebooks end-to-end: Run both notebooks completely to catch issues
+Validate data pipeline: Ensure automatic downloads work reliably
+Check dependencies: Verify all imports work in the Docker environment
+Performance testing: Ensure training times are reasonable for tutorials
+Error handling: Add better error messages for common issues
+Phase 5: Content Improvements (Priority: Medium)
+Goal: Enhance educational value for beginners.
+
+Actions:
+
+Add concept explanations: More intuitive explanations of probabilistic forecasting
+Improve visualizations: Make plots more interpretable with better labels
+Add checkpoints: Include "what you should understand" sections
+Create summary sections: Help beginners connect concepts across notebooks
+Implementation Timeline
+Week 1: Phase 1 (refactor utils) + Phase 4 (testing)
+Week 2: Phase 2 (notebook cleanup) + Phase 4 continued
+Week 3: Phase 3 (documentation) + Phase 5 (content improvements)
+Week 4: Final testing and polish
+
+Success Criteria
+Utils file reduced to ~1500-1800 lines with clear organization
+Notebooks run cleanly with minimal code, focusing on explanations
+All functions have informal, helpful comments
+Docker environment works reliably for beginners
+Clear learning progression from basic concepts to advanced application
+No emojis or overly verbose documentation
