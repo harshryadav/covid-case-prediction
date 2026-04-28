@@ -3,8 +3,15 @@
         eval run-all smoke test lint \
         docker-build docker-shell docker-preprocess docker-train tb clean
 
-PYTHON ?= python
+# Python executable (requires >= 3.10). Search PATH for python3.10 or python3.
+# If not found, you can override: make PYTHON=python3.10 ... or set it in your shell
+PYTHON_SEARCH := python3.10 python3
+PYTHON := $(firstword $(shell $(foreach py,$(PYTHON_SEARCH),which $(py) 2>/dev/null ||) true))
 CONFIG ?= configs/e2_srcnn.yaml
+
+ifeq ($(PYTHON),)
+$(error Python 3.10+ not found in PATH. Please install Python 3.10+ or set PYTHON=/path/to/python)
+endif
 
 help:
 	@echo "Common targets:"
@@ -20,6 +27,10 @@ help:
 	@echo "  docker-build     Build the Docker image"
 	@echo "  docker-shell     Interactive shell in the dev container"
 	@echo "  tb               Launch TensorBoard on runs/ (port 6006)"
+
+venv:
+	python3 -m venv .venv
+	source .venv/bin/activate && pip install -e '.[torch,dev]'
 
 install:
 	$(PYTHON) -m pip install -e '.[torch,dev]'

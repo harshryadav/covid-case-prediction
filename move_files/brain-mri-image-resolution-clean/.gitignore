@@ -16,6 +16,7 @@ env/
 .ruff_cache/
 .coverage
 htmlcov/
+runs/
 
 # Editors / OS
 .vscode/
